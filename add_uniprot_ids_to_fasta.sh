@@ -16,6 +16,14 @@
 ## Using the output, Bombus proteins with matches in both Apis and Drosophila
 ## were subsetted. 
 
+# BLAST command
+#blastp -query ../Drosophila_UniProt.fasta \
+#       -db 2017-04-07_Bter_2015_v1.fasta \
+#       -evalue 1e-06 \
+#       -num_threads 10 \
+#       -outfmt 6 | sort -k1,1 -k12,12nr -k11,11n | sort -u -k1,1 --merge \ |
+#       > best_single_hits.bter_vs_dros.blastn
+
 ## Subset the sequence information for homologues
  cut -d '_' -f 1,2 GCF_000214255.1_Bter_1.0_protein.homologue_list.txt > GCF_000214255.1_Bter_1.0_protein.homologue_list.tmp
 
