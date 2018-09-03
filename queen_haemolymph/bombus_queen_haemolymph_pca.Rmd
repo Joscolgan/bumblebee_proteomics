@@ -1,0 +1,91 @@
+--- 
+title: "Bombus queen haemolymph proteome"
+output: bombus_queen_haemolymph_pca.html
+--- 
+
+Introduction:
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, Perseus, normalise and perform a principal component analysis. Two principal components are then plotted using the R package, ggplot2. 
+
+```{r}
+# Load libraries; install from scratch if needed
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer")
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        biocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+dir.create("results")
+```
+
+1. Read in input data:
+
+```{r}
+## Read in data and store as a dataframe:
+haem_data <- read.table(file = "input/input_for_PCA.tmp", header = TRUE)
+
+## Assign the first column containing protein_id to the rowname:
+rownames(haem_data) <- haem_data$Protein_ID
+
+## Remove the protein ID column:
+haem_data$Protein_ID <- NULL
+
+## Transpose:
+haem_data_df <- as.data.frame(t(haem_data))
+
+## Add a column indicating life-cycle 'stage':
+rownames(haem_data_df)
+
+## 
+stage <- c(rep("gyne", 4), rep("prediapause", 4), rep("early_diapause", 4),
+           rep("late diapause", 4), rep("6_hrs_postdiapause", 4), rep("48_hours_postdiapause", 4))
+
+## 
+haem_data_df$stage <- stage 
+
+## Add levels for plotting:
+levels(haem_data_df$stage) <- factor(haem_data_df$stage, levels = haem_data_df$stage)
+
+## Subset for plotting:
+haem_data_subset <- haem_data_df[,c(1:125)]
+```
+
+2. Perform PCA and plot:
+
+```{r}
+## Log transform for plotting:
+haem_data_subset_log <- log(haem_data_subset)
+
+## Perform PCA:
+haem_data_subset_log_pca <- prcomp(haem_data_subset_log,
+                 center = TRUE,
+                 scale. = TRUE) 
+
+## Plot all principal components:
+plot(haem_data_subset_log_pca, type = "l")
+
+## Perform PCA and plot first two components:
+pca_plot <- autoplot(prcomp(haem_data_subset_log, 
+                scale. = TRUE,
+                center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw()
+
+## Increase the font size:
+pca_plot<- pca_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+                #axis.text.x=element_text(size=12),
+                #axis.text.y = element_text(size=12))
+```
