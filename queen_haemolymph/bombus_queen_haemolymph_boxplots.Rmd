@@ -1,0 +1,623 @@
+--- 
+title: "Bombus queen haemolymph proteome_boxplots"
+output: bombus_queen_haemolymph_boxplots.html
+--- 
+
+Introduction:
+=============
+
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, Perseus, log transform and plot as boxplots using the R package, ggplot2. 
+
+1. Load libraries:
+
+```{r}
+# Load libraries; install from scratch if needed
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer")
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        biocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+
+dir.create("results")
+
+```
+
+1. Read in input data:
+
+```{r}
+## Read in data and store as a dataframe:
+haem_data <- read.table(file = "input/input_for_PCA.de_immune_genes.txt", header = TRUE)
+
+## Assign the first column containing protein_id to the rowname:
+rownames(haem_data) <- haem_data$Protein_ID
+
+## Remove the protein ID column:
+haem_data$Protein_ID <- NULL
+
+## Transpose:
+haem_data_df <- as.data.frame(t(haem_data))
+
+## Add a column indicating life-cycle 'stage':
+rownames(haem_data_df)
+
+## Create a vector of life-cycle stages:
+stage <- c(rep("gyne", 4), rep("prediapause", 4), rep("early_diapause", 4),
+           rep("late diapause", 4), rep("6_hrs_postdiapause", 4), rep("48_hours_postdiapause", 4))
+
+## Add stage: 
+haem_data_df$stage <- stage 
+
+## Add levels for plotting:
+levels(haem_data_df$stage) <- factor(haem_data_df$stage, levels = haem_data_df$stage)
+
+## Subset for plotting:
+haem_data_subset <- haem_data_df[,c(1:12)]
+```
+
+2. Subset proteins of interest and plot:
+
+```{r}
+##
+abaecin <- haem_data_subset[,1]
+abaecin_gyne<- abaecin[1:4]
+abaecin_predia<- abaecin[5:8]
+abaecin_early_diapause<- abaecin[9:12]
+abaecin_late_diapause<- abaecin[13:16]
+abaecin_early_postdiapause<- abaecin[17:20]
+abaecin_late_postdiapause<- abaecin[21:24]
+
+abaecin_df <- cbind(abaecin_gyne, abaecin_predia,
+                 abaecin_early_diapause, abaecin_late_diapause,
+                 abaecin_early_postdiapause, abaecin_late_postdiapause)
+
+colnames(abaecin_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+abaecin_df <- as.data.frame(abaecin_df)
+
+## Reshape for plotting:
+abaecin_df_melt <- melt(abaecin_df)
+
+## Update column names:
+colnames(abaecin_df_melt) <- c("Life_stage", "Log2_values")
+
+abaecin_plot <- ggplot(abaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+abaecin_plot <- abaecin_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+Plot for defensin:
+
+```{r}
+defensin <- haem_data_subset[,2]
+defensin_gyne<- defensin[1:4]
+defensin_predia<- defensin[5:8]
+defensin_early_diapause<- defensin[9:12]
+defensin_late_diapause<- defensin[13:16]
+defensin_early_postdiapause<- defensin[17:20]
+defensin_late_postdiapause<- defensin[21:24]
+
+defensin_df <- cbind(defensin_gyne, defensin_predia,
+                 defensin_early_diapause, defensin_late_diapause,
+                 defensin_early_postdiapause, defensin_late_postdiapause)
+
+colnames(defensin_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+defensin_df <- as.data.frame(defensin_df)
+
+## Reshape for plotting:
+defensin_df_melt <- melt(defensin_df)
+
+## Update column names:
+colnames(defensin_df_melt) <- c("Life_stage", "Log2_values")
+
+defensin_plot <- ggplot(defensin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+defensin_plot <- defensin_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+Plot hymenoptaecin:
+
+```{r}
+## 
+hymenoptaecin <- haem_data_subset[,3]
+hymenoptaecin_gyne<- hymenoptaecin[1:4]
+hymenoptaecin_predia<- hymenoptaecin[5:8]
+hymenoptaecin_early_diapause<- hymenoptaecin[9:12]
+hymenoptaecin_late_diapause<- hymenoptaecin[13:16]
+hymenoptaecin_early_postdiapause<- hymenoptaecin[17:20]
+hymenoptaecin_late_postdiapause<- hymenoptaecin[21:24]
+
+hymenoptaecin_df <- cbind(hymenoptaecin_gyne, hymenoptaecin_predia,
+                 hymenoptaecin_early_diapause, hymenoptaecin_late_diapause,
+                 hymenoptaecin_early_postdiapause, hymenoptaecin_late_postdiapause)
+
+colnames(hymenoptaecin_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+hymenoptaecin_df <- as.data.frame(hymenoptaecin_df)
+
+## Reshape for plotting:
+hymenoptaecin_df_melt <- melt(hymenoptaecin_df)
+
+## Update column names:
+colnames(hymenoptaecin_df_melt) <- c("Life_stage", "Log2_values")
+
+hymenoptaecin_plot <- ggplot(hymenoptaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+hymenoptaecin_plot <- hymenoptaecin_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+4. XP_003394100.1 - lysozyme_2
+
+```{r}
+## 
+lysozyme_2 <- haem_data_subset[,4]
+lysozyme_2_gyne<- lysozyme_2[1:4]
+lysozyme_2_predia<- lysozyme_2[5:8]
+lysozyme_2_early_diapause<- lysozyme_2[9:12]
+lysozyme_2_late_diapause<- lysozyme_2[13:16]
+lysozyme_2_early_postdiapause<- lysozyme_2[17:20]
+lysozyme_2_late_postdiapause<- lysozyme_2[21:24]
+
+lysozyme_2_df <- cbind(lysozyme_2_gyne, lysozyme_2_predia,
+                 lysozyme_2_early_diapause, lysozyme_2_late_diapause,
+                 lysozyme_2_early_postdiapause, lysozyme_2_late_postdiapause)
+
+colnames(lysozyme_2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+lysozyme_2_df <- as.data.frame(lysozyme_2_df)
+
+## Reshape for plotting:
+lysozyme_2_df_melt <- melt(lysozyme_2_df)
+
+## Update column names:
+colnames(lysozyme_2_df_melt) <- c("Life_stage", "Log2_values")
+
+lysozyme_2_plot <- ggplot(lysozyme_2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+lysozyme_2_plot <- lysozyme_2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+5. AEN62314.1 - IRP30
+
+```{r}
+## 
+IRP30 <- haem_data_subset[,5]
+IRP30_gyne<- IRP30[1:4]
+IRP30_predia<- IRP30[5:8]
+IRP30_early_diapause<- IRP30[9:12]
+IRP30_late_diapause<- IRP30[13:16]
+IRP30_early_postdiapause<- IRP30[17:20]
+IRP30_late_postdiapause<- IRP30[21:24]
+
+IRP30_df <- cbind(IRP30_gyne, IRP30_predia,
+                 IRP30_early_diapause, IRP30_late_diapause,
+                 IRP30_early_postdiapause, IRP30_late_postdiapause)
+
+colnames(IRP30_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+IRP30_df <- as.data.frame(IRP30_df)
+
+## Reshape for plotting:
+IRP30_df_melt <- melt(IRP30_df)
+
+## Update column names:
+colnames(IRP30_df_melt) <- c("Life_stage", "Log2_values")
+
+IRP30_plot <- ggplot(IRP30_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+IRP30_plot <- IRP30_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+6. XP_012173325.1 - peptidoglycan-recognition protein 2
+
+```{r}
+## 
+PGRP2 <- haem_data_subset[,6]
+PGRP2_gyne<- PGRP2[1:4]
+PGRP2_predia<- PGRP2[5:8]
+PGRP2_early_diapause<- PGRP2[9:12]
+PGRP2_late_diapause<- PGRP2[13:16]
+PGRP2_early_postdiapause<- PGRP2[17:20]
+PGRP2_late_postdiapause<- PGRP2[21:24]
+
+PGRP2_df <- cbind(PGRP2_gyne, PGRP2_predia,
+                 PGRP2_early_diapause, PGRP2_late_diapause,
+                 PGRP2_early_postdiapause, PGRP2_late_postdiapause)
+
+colnames(PGRP2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+PGRP2_df <- as.data.frame(PGRP2_df)
+
+## Reshape for plotting:
+PGRP2_df_melt <- melt(PGRP2_df)
+
+## Update column names:
+colnames(PGRP2_df_melt) <- c("Life_stage", "Log2_values")
+
+PGRP2_plot <- ggplot(PGRP2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+PGRP2_plot <- PGRP2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+7. XP_012173977.1 - spaetzle
+
+```{r}
+## 
+spaetzle <- haem_data_subset[,7]
+spaetzle_gyne<- spaetzle[1:4]
+spaetzle_predia<- spaetzle[5:8]
+spaetzle_early_diapause<- spaetzle[9:12]
+spaetzle_late_diapause<- spaetzle[13:16]
+spaetzle_early_postdiapause<- spaetzle[17:20]
+spaetzle_late_postdiapause<- spaetzle[21:24]
+
+spaetzle_df <- cbind(spaetzle_gyne, spaetzle_predia,
+                 spaetzle_early_diapause, spaetzle_late_diapause,
+                 spaetzle_early_postdiapause, spaetzle_late_postdiapause)
+
+colnames(spaetzle_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+spaetzle_df <- as.data.frame(spaetzle_df)
+
+## Reshape for plotting:
+spaetzle_df_melt <- melt(spaetzle_df)
+
+## Update column names:
+colnames(spaetzle_df_melt) <- c("Life_stage", "Log2_values")
+
+spaetzle_plot <- ggplot(spaetzle_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+spaetzle_plot <- spaetzle_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+
+```
+
+8. XP_012167926.1 - spaetzle_2 
+
+```{r}
+## 
+spaetzle_2 <- haem_data_subset[,8]
+spaetzle_2_gyne<- spaetzle_2[1:4]
+spaetzle_2_predia<- spaetzle_2[5:8]
+spaetzle_2_early_diapause<- spaetzle_2[9:12]
+spaetzle_2_late_diapause<- spaetzle_2[13:16]
+spaetzle_2_early_postdiapause<- spaetzle_2[17:20]
+spaetzle_2_late_postdiapause<- spaetzle_2[21:24]
+
+spaetzle_2_df <- cbind(spaetzle_2_gyne, spaetzle_2_predia,
+                 spaetzle_2_early_diapause, spaetzle_2_late_diapause,
+                 spaetzle_2_early_postdiapause, spaetzle_2_late_postdiapause)
+
+colnames(spaetzle_2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+spaetzle_2_df <- as.data.frame(spaetzle_2_df)
+
+## Reshape for plotting:
+spaetzle_2_df_melt <- melt(spaetzle_2_df)
+
+## Update column names:
+colnames(spaetzle_2_df_melt) <- c("Life_stage", "Log2_values")
+
+spaetzle_2_plot <- ggplot(spaetzle_2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+spaetzle_2_plot <- spaetzle_2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+9. XP_012170668.1 - lysozyme 
+
+```{r}
+## 
+lysozyme <- haem_data_subset[,9]
+lysozyme_gyne<- lysozyme[1:4]
+lysozyme_predia<- lysozyme[5:8]
+lysozyme_early_diapause<- lysozyme[9:12]
+lysozyme_late_diapause<- lysozyme[13:16]
+lysozyme_early_postdiapause<- lysozyme[17:20]
+lysozyme_late_postdiapause<- lysozyme[21:24]
+
+lysozyme_df <- cbind(lysozyme_gyne, lysozyme_predia,
+                 lysozyme_early_diapause, lysozyme_late_diapause,
+                 lysozyme_early_postdiapause, lysozyme_late_postdiapause)
+
+colnames(lysozyme_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+lysozyme_df <- as.data.frame(lysozyme_df)
+
+## Reshape for plotting:
+lysozyme_df_melt <- melt(lysozyme_df)
+
+## Update column names:
+colnames(lysozyme_df_melt) <- c("Life_stage", "Log2_values")
+
+lysozyme_plot <- ggplot(lysozyme_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+lysozyme_plot <- lysozyme_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+10. XP_012170795.1 - PGRPS2
+
+```{r}
+## 
+PGRPS2 <- haem_data_subset[,10]
+PGRPS2_gyne<- PGRPS2[1:4]
+PGRPS2_predia<- PGRPS2[5:8]
+PGRPS2_early_diapause<- PGRPS2[9:12]
+PGRPS2_late_diapause<- PGRPS2[13:16]
+PGRPS2_early_postdiapause<- PGRPS2[17:20]
+PGRPS2_late_postdiapause<- PGRPS2[21:24]
+
+PGRPS2_df <- cbind(PGRPS2_gyne, PGRPS2_predia,
+                 PGRPS2_early_diapause, PGRPS2_late_diapause,
+                 PGRPS2_early_postdiapause, PGRPS2_late_postdiapause)
+
+colnames(PGRPS2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+PGRPS2_df <- as.data.frame(PGRPS2_df)
+
+## Reshape for plotting:
+PGRPS2_df_melt <- melt(PGRPS2_df)
+
+## Update column names:
+colnames(PGRPS2_df_melt) <- c("Life_stage", "Log2_values")
+
+PGRPS2_plot <- ggplot(PGRPS2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+
+PGRPS2_plot <- PGRPS2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+11. XP_012166703.1 - leukocyte elastase inhibitor:
+
+```{r}
+## 
+serpin <- haem_data_subset[,11]
+serpin_gyne<- serpin[1:4]
+serpin_predia<- serpin[5:8]
+serpin_early_diapause<- serpin[9:12]
+serpin_late_diapause<- serpin[13:16]
+serpin_early_postdiapause<- serpin[17:20]
+serpin_late_postdiapause<- serpin[21:24]
+
+serpin_df <- cbind(serpin_gyne, serpin_predia,
+                 serpin_early_diapause, serpin_late_diapause,
+                 serpin_early_postdiapause, serpin_late_postdiapause)
+
+colnames(serpin_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+serpin_df <- as.data.frame(serpin_df)
+
+## Reshape for plotting:
+serpin_df_melt <- melt(serpin_df)
+
+## Update column names:
+colnames(serpin_df_melt) <- c("Life_stage", "Log2_values")
+
+serpin_plot <- ggplot(serpin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+serpin_plot <- serpin_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+12. XP_012167632.1 - beta-glucan recognition proten
+
+```{r}
+## 
+BGRP <- haem_data_subset[,12]
+BGRP_gyne<- BGRP[1:4]
+BGRP_predia<- BGRP[5:8]
+BGRP_early_diapause<- BGRP[9:12]
+BGRP_late_diapause<- BGRP[13:16]
+BGRP_early_postdiapause<- BGRP[17:20]
+BGRP_late_postdiapause<- BGRP[21:24]
+
+BGRP_df <- cbind(BGRP_gyne, BGRP_predia,
+                 BGRP_early_diapause, BGRP_late_diapause,
+                 BGRP_early_postdiapause, BGRP_late_postdiapause)
+
+colnames(BGRP_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+BGRP_df <- as.data.frame(BGRP_df)
+
+## Reshape for plotting:
+BGRP_df_melt <- melt(BGRP_df)
+
+## Update column names:
+colnames(BGRP_df_melt) <- c("Life_stage", "Log2_values")
+
+BGRP_plot <- ggplot(BGRP_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                #ggtitle("Abaecin") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+BGRP_plot<- BGRP_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+Extract common legend for shared plots:
+
+```{r}
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)}
+
+mylegend<-g_legend(BGRP_plot)
+
+```
+
+4. Generate combined plots:
+
+```{r}
+## 
+ggarrange(abaecin_plot, defensin_plot, hymenoptaecin_plot, lysozyme_2_plot,
+          IRP30_plot, PGRP2_plot, spaetzle_plot, spaetzle_2_plot,
+          lysozyme_plot, PGRPS2_plot, serpin_plot, BGRP_plot,
+          ncol = 4, nrow = 3, common.legend = TRUE)
+```
+
