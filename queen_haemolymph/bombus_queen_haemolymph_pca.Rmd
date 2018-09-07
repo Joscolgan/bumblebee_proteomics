@@ -8,7 +8,7 @@ The purpose of this script is to take label-free quantification (LFQ) values fro
 
 ```{r}
 # Load libraries; install from scratch if needed
-libraries <- c("ggplot2", "ggfortify", "RColorBrewer")
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer", "ggpubr")
 for (lib in libraries) {
     if (require(package = lib, character.only = TRUE)) {
         print("Successful")
@@ -57,21 +57,18 @@ haem_data_subset <- haem_data_df[,c(1:125)]
 2. Perform PCA and plot:
 
 ```{r}
-## Log transform for plotting:
-haem_data_subset_log <- log(haem_data_subset)
-
 ## Perform PCA:
-haem_data_subset_log_pca <- prcomp(haem_data_subset_log,
+haem_data_subset_pca <- prcomp(haem_data_subset,
                  center = TRUE,
                  scale. = TRUE) 
 
 ## Plot all principal components:
-plot(haem_data_subset_log_pca, type = "l")
+plot(haem_data_subset_pca, type = "l")
 
 ## Perform PCA and plot first two components:
-pca_plot <- autoplot(prcomp(haem_data_subset_log, 
-                scale. = TRUE,
-                center = TRUE), 
+pca_plot <- autoplot(prcomp(haem_data_subset), x=1, y=5,
+                #scale. = TRUE,
+                #center = TRUE), 
          data=haem_data_df, 
          colour = "stage",
          fill = "black",
@@ -89,3 +86,87 @@ pca_plot<- pca_plot +
                 #axis.text.x=element_text(size=12),
                 #axis.text.y = element_text(size=12))
 ```
+
+Plot a number of principal components:
+
+```{r}
+## Plot
+pca_plot_1_2 <- autoplot(prcomp(haem_data_subset), x=1, y=2,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 1 and 3:
+pca_plot_1_3 <- autoplot(prcomp(haem_data_subset), x=1, y=3,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 1 and 4:
+pca_plot_1_4 <- autoplot(prcomp(haem_data_subset), x=1, y=4,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 1 and 5:
+pca_plot_1_5 <- autoplot(prcomp(haem_data_subset), x=1, y=5,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+```
+
+Plot together:
+
+```{r}
+## Plot together:
+ggarrange(pca_plot_1_2,
+          pca_plot_1_3,
+          pca_plot_1_4,
+          pca_plot_1_5,
+          labels = c("A", "B", "C", "D"),
+          nrow = 2, ncol =2,
+          common.legend = TRUE)
+```
+
+
+
