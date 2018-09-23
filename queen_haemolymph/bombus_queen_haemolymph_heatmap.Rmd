@@ -1,0 +1,96 @@
+---
+title: "haemolymph_heatmaps"
+author: "JoeColgan"
+date: "23 September 2018"
+output: html_document
+---
+
+The purpose of this script is to take normalised z-score transformations of label free quantification (LFQ) values as input and generate a heatmap for differentially abundant proteins across the queen life-cycle stages:
+
+Load libraries:
+
+```{r}
+## Load libraries:
+libraries <- c("lintr", "ggplot2", "ggpubr", "reshape", "Rmisc")
+for (lib in libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                source("https://bioconductor.org/biocLite.R")
+                biocLite(pkgs = lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+Load data:
+
+```{r}
+## Read in data:
+z_values <- read.table("./z_score_input_for_heatmap.txt", header= FALSE)
+
+## Make rownames the protein description:
+rownames(z_values) <- z_values$V1
+z_values$V1 <- NULL
+
+## Updaate columns:
+colnames(z_values) <- c("Virgin queen (Gyne)", 
+                        "Prediapause", 
+                        "Early diapause", 
+                        "Late diapause", 
+                        "6 hrs postdiapause", 
+                        "48 hours postdiapause")
+```
+
+Convert into a melted dataframe to allow for plotting:
+
+```{r}
+## Calculate eucleidean distance between rows:
+dd<-hclust(dist(as.matrix(z_values)))
+
+## Reorder based on cluster order:
+z_values_ordered <- as.data.frame(z_values[dd$order, ])
+
+## Add description:
+z_values_ordered$description <- rownames(z_values_ordered)
+
+## Melt dataframe:
+z_values_ordered_melt <- melt(z_values_ordered)
+
+## Rename columns:
+colnames(z_values_ordered_melt) <- c("Protein_ID", "Stage", "Z_score value")
+
+## Reorder "gene_name" for plotting:
+z_values_ordered_melt$Protein_ID <- 
+        factor(z_values_ordered_melt$Protein_ID, levels = rev(unique(c(as.character(unlist(z_values_ordered_melt$Protein_ID))))))
+```
+
+Generate heatmap:
+
+```{r}
+## Plot heatmap:
+heatmap_plot <- ggplot(z_values_ordered_melt, aes(Stage, Protein_ID)) +
+                geom_tile(aes(fill = `Z_score value`)) +
+                #geom_vline(xintercept = c(0.5, 4.5, 8.5)) +
+                #geom_hline(yintercept = c(32.5, 33.5)) + 
+                scale_fill_gradient2(low = "green", mid = "black", high = "red") +
+                ylab("") +
+                xlab("") +
+                theme(legend.title = element_text(size = 12, face = "bold"),
+                      legend.text = element_text(size = 12, face = "bold"),
+                      axis.text.x = element_text(angle = 45, hjust = 1, size = 17, face = "bold"),
+                      #axis.text.x=element_text(size = 12, face="bold"),
+                      axis.text.y = element_text(size = 20, face = "plain", colour="black"),
+                      axis.title = element_text(size = 12,face = "bold"),
+                      panel.grid.major = element_blank(),
+                      panel.grid.minor = element_blank(),
+                      panel.background = element_blank(),
+                      legend.position = "top") +
+                scale_y_discrete(position = "right") +
+                labs(fill = 'Z-score fold change')
+  #theme(axis.text.y = element_text(face = c(rep('plain', 25),'bold', rep("plain", 20)))) 
+
+## Output:
+ggsave("de_proteins_heatmap.png", height = 34, width=30)
+```
+
