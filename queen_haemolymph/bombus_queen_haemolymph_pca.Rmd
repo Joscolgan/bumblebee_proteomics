@@ -26,13 +26,13 @@ dir.create("results")
 
 ```{r}
 ## Read in data and store as a dataframe:
-haem_data <- read.table(file = "input/input_for_PCA.txt", header = TRUE)
+haem_data <- read.table(file = "input/diapause_results_061118_for_pca_updated_names.txt", header = TRUE)
 
 ## Assign the first column containing protein_id to the rowname:
-rownames(haem_data) <- haem_data$Protein_ID
+rownames(haem_data) <- haem_data$T._Protein_ID
 
 ## Remove the protein ID column:
-haem_data$Protein_ID <- NULL
+haem_data$T._Protein_ID <- NULL
 
 ## Transpose:
 haem_data_df <- as.data.frame(t(haem_data))
@@ -48,7 +48,8 @@ stage <- c(rep("gyne", 4), rep("prediapause", 4), rep("early_diapause", 4),
 haem_data_df$stage <- stage 
 
 ## Add levels for plotting:
-levels(haem_data_df$stage) <- factor(haem_data_df$stage, levels = haem_data_df$stage)
+haem_data_df$stage <- factor(haem_data_df$stage,
+                             levels = c(unique(as.character(unlist(haem_data_df$stage)))))
 
 ## Subset for plotting:
 haem_data_subset <- haem_data_df[,c(1:70)]
@@ -168,7 +169,7 @@ ggarrange(pca_plot_1_2,
           common.legend = TRUE)
 
 ## Save as a .png file:
-ggsave(file="pca_1_5_haemolymph_life_cycles.png",
+ggsave(file="results/pca_1_5_haemolymph_life_cycles_RdBu.png",
        height = 10,
        width = 10)
 
