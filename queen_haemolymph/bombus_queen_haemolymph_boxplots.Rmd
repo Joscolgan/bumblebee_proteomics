@@ -32,16 +32,16 @@ dir.create("results")
 
 ```{r}
 ## Read in data and store as a dataframe:
-haem_data <- read.table(file = "input/input_for_PCA.de_immune_genes.txt", header = FALSE)
+haem_data <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots_immune.txt", header = FALSE)
 
 ## Assign the first column containing protein_id to the rowname:
 rownames(haem_data) <- haem_data$V1
 
-## Remove the protein ID column:
-haem_data$V1 <- NULL
+## Subset columns containing intensity values:
+haem_data_subset <- haem_data[5:28]
 
 ## Transpose:
-haem_data_df <- as.data.frame(t(haem_data))
+haem_data_df <- as.data.frame(t(haem_data_subset))
 
 ## Add a column indicating life-cycle 'stage':
 rownames(haem_data_df)
@@ -54,18 +54,15 @@ stage <- c(rep("gyne", 4), rep("prediapause", 4), rep("early_diapause", 4),
 haem_data_df$stage <- stage 
 
 ## Add levels for plotting:
-levels(haem_data_df$stage) <- factor(haem_data_df$stage, levels = haem_data_df$stage)
-
-## Subset for plotting:
-haem_data_subset <- haem_data_df[,c(1:17)]
+haem_data_df$stage <- factor(haem_data_df$stage, levels = c(unique(as.character(unlist(haem_data_df$stage)))))
 ```
 
 2. Subset proteins of interest and plot:
-16. Abaecin
+## ADB29128.1 - Abaecin
 
 ```{r}
 ## Subset 
-abaecin <- haem_data_subset[,16]
+abaecin <- haem_data_df$`ADB29128.1_abaecin,_partial_[Bombus_terrestris]`
 abaecin_gyne<- abaecin[1:4]
 abaecin_predia<- abaecin[5:8]
 abaecin_early_diapause<- abaecin[9:12]
@@ -93,6 +90,7 @@ abaecin_plot <- ggplot(abaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Li
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
+                ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Abaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -103,13 +101,12 @@ abaecin_plot <- abaecin_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
-
 ```
 
-15. defensin:
+## ADB29129.1 - Defensin:
 
 ```{r}
-defensin <- haem_data_subset[,15]
+defensin <- haem_data_df$`ADB29129.1_defensin_1,_partial_[Bombus_terrestris]`
 defensin_gyne<- defensin[1:4]
 defensin_predia<- defensin[5:8]
 defensin_early_diapause<- defensin[9:12]
@@ -137,6 +134,7 @@ defensin_plot <- ggplot(defensin_df_melt, aes(x=Life_stage, y=Log2_values, fill=
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
+                ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Defensin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -150,11 +148,11 @@ defensin_plot <- defensin_plot +
 
 ```
 
-14. hymenoptaecin:
+## ADB29130.1 - Hymenoptaecin:
 
 ```{r}
 ## 
-hymenoptaecin <- haem_data_subset[,14]
+hymenoptaecin <- haem_data_df$`ADB29130.1_hymenoptaecin,_partial_[Bombus_terrestris]`
 hymenoptaecin_gyne<- hymenoptaecin[1:4]
 hymenoptaecin_predia<- hymenoptaecin[5:8]
 hymenoptaecin_early_diapause<- hymenoptaecin[9:12]
@@ -182,6 +180,7 @@ hymenoptaecin_plot <- ggplot(hymenoptaecin_df_melt, aes(x=Life_stage, y=Log2_val
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
+                ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Hymenoptaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -194,103 +193,72 @@ hymenoptaecin_plot <- hymenoptaecin_plot +
                 axis.text.x = element_blank())
 ```
 
-
-5. XP_003397822.1 - NPC2
+## C0HKX3.1 - Apidaecin
 
 ```{r}
 ## 
-NPC2 <- haem_data_subset[,5]
-NPC2_gyne<- NPC2[1:4]
-NPC2_predia<- NPC2[5:8]
-NPC2_early_diapause<- NPC2[9:12]
-NPC2_late_diapause<- NPC2[13:16]
-NPC2_early_postdiapause<- NPC2[17:20]
-NPC2_late_postdiapause<- NPC2[21:24]
+apidaecin <- haem_data_df$`C0HKX3.1_Apidaecin_Bb_+A_[Bombus_terrestris]`
+apidaecin_gyne<- apidaecin[1:4]
+apidaecin_predia<- apidaecin[5:8]
+apidaecin_early_diapause<- apidaecin[9:12]
+apidaecin_late_diapause<- apidaecin[13:16]
+apidaecin_early_postdiapause<- apidaecin[17:20]
+apidaecin_late_postdiapause<- apidaecin[21:24]
 
-NPC2_df <- cbind(NPC2_gyne, NPC2_predia,
-                 NPC2_early_diapause, NPC2_late_diapause,
-                 NPC2_early_postdiapause, NPC2_late_postdiapause)
+apidaecin_df <- cbind(apidaecin_gyne, apidaecin_predia,
+                 apidaecin_early_diapause, apidaecin_late_diapause,
+                 apidaecin_early_postdiapause, apidaecin_late_postdiapause)
 
-colnames(NPC2_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(apidaecin_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-NPC2_df <- as.data.frame(NPC2_df)
+apidaecin_df <- as.data.frame(apidaecin_df)
 
 ## Reshape for plotting:
-NPC2_df_melt <- melt(NPC2_df)
+apidaecin_df_melt <- melt(apidaecin_df)
 
 ## Update column names:
-colnames(NPC2_df_melt) <- c("Life_stage", "Log2_values")
+colnames(apidaecin_df_melt) <- c("Life_stage", "Log2_values")
 
-NPC2_plot <- ggplot(NPC2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+apidaecin_plot <- ggplot(apidaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
+                ylim(c(24,35)) +
                 theme(legend.position="none") +
-                ggtitle("NPC2") +
+                ggtitle("Apidaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-NPC2_plot <- NPC2_plot +
+apidaecin_plot <- apidaecin_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
 
 ```
+ 
+## Generate a combined plot:
+ 
+```{r, message = FALSE}
+ggarrange(abaecin_plot,
+          defensin_plot,
+          hymenoptaecin_plot,
+          apidaecin_plot,
+          ncol = 4, nrow=1,
+          common.legend = TRUE)
 
-6. XP_003400229.1 - MD_2_related_lipid_recognition_protein
-
-```{r}
-## 
-MDL2 <- haem_data_subset[,6]
-MDL2_gyne<- MDL2[1:4]
-MDL2_predia<- MDL2[5:8]
-MDL2_early_diapause<- MDL2[9:12]
-MDL2_late_diapause<- MDL2[13:16]
-MDL2_early_postdiapause<- MDL2[17:20]
-MDL2_late_postdiapause<- MDL2[21:24]
-
-MDL2_df <- cbind(MDL2_gyne, MDL2_predia,
-                 MDL2_early_diapause, MDL2_late_diapause,
-                 MDL2_early_postdiapause, MDL2_late_postdiapause)
-
-colnames(MDL2_df) <- c("gyne", "prediapause", "early_diapause",
-                       "late_diapause", "early_postdiapause", "late_postdiapause")
-
-## Make sure it is a dataframe:
-MDL2_df <- as.data.frame(MDL2_df)
-
-## Reshape for plotting:
-MDL2_df_melt <- melt(MDL2_df)
-
-## Update column names:
-colnames(MDL2_df_melt) <- c("Life_stage", "Log2_values")
-
-MDL2_plot <- ggplot(MDL2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
-                geom_boxplot() +
-                xlab("Life stage") +
-                ylab("Log2 values") +
-                theme(legend.position="none") +
-                ggtitle("MDL2") +
-                scale_fill_brewer(type="qual", palette="RdBu") +
-                theme_bw() +
-                theme(legend.position="top")
-
-MDL2_plot <- MDL2_plot +
-                theme(axis.text=element_text(size=15),
-                axis.title= element_text(size=15,face="bold"), 
-                axis.text.x = element_blank())
-
+ggsave(file="results/boxplot_for_amps.png",
+       height = 10,
+       width = 20)
 ```
 
-
-7. XP_012176660.1 - Leucine_rich_repeat_protein
+6. XP_003394691.1 - LRRP
 
 ```{r}
 ## 
-LRRP <- haem_data_subset[,7]
+LRRP <- haem_data_df$`XP_003394838.1_leucine-rich_repeat-containing_protein_70_[Bombus_terrestris]`
 LRRP_gyne<- LRRP[1:4]
 LRRP_predia<- LRRP[5:8]
 LRRP_early_diapause<- LRRP[9:12]
@@ -298,7 +266,7 @@ LRRP_late_diapause<- LRRP[13:16]
 LRRP_early_postdiapause<- LRRP[17:20]
 LRRP_late_postdiapause<- LRRP[21:24]
 
-LRRP_df <- cbind(LRRP_gyne, LRRP_predia,
+LRRP_df <- cbind(LRRP_gyne,LRRP_predia,
                  LRRP_early_diapause, LRRP_late_diapause,
                  LRRP_early_postdiapause, LRRP_late_postdiapause)
 
@@ -328,47 +296,93 @@ LRRP_plot <- LRRP_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
+
 ```
 
-8. XP_003395667.1 - E16kDa
+
+7. XP_012167632.1 - BGBP
 
 ```{r}
 ## 
-E16kDa <- haem_data_subset[,8]
-E16kDa_gyne<- E16kDa[1:4]
-E16kDa_predia<- E16kDa[5:8]
-E16kDa_early_diapause<- E16kDa[9:12]
-E16kDa_late_diapause<- E16kDa[13:16]
-E16kDa_early_postdiapause<- E16kDa[17:20]
-E16kDa_late_postdiapause<- E16kDa[21:24]
+BGBP <- haem_data_df$`XP_012167632.1_beta-1,3-glucan-binding_protein_1_[Bombus_terrestris]`
+BGBP_gyne<- BGBP[1:4]
+BGBP_predia<- BGBP[5:8]
+BGBP_early_diapause<- BGBP[9:12]
+BGBP_late_diapause<- BGBP[13:16]
+BGBP_early_postdiapause<- BGBP[17:20]
+BGBP_late_postdiapause<- BGBP[21:24]
 
-E16kDa_df <- cbind(E16kDa_gyne, E16kDa_predia,
-                 E16kDa_early_diapause, E16kDa_late_diapause,
-                 E16kDa_early_postdiapause, E16kDa_late_postdiapause)
+BGBP_df <- cbind(BGBP_gyne, BGBP_predia,
+                BGBP_early_diapause, BGBP_late_diapause,
+                BGBP_early_postdiapause, BGBP_late_postdiapause)
 
-colnames(E16kDa_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(BGBP_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-E16kDa_df <- as.data.frame(E16kDa_df)
+BGBP_df <- as.data.frame(BGBP_df)
 
 ## Reshape for plotting:
-E16kDa_df_melt <- melt(E16kDa_df)
+BGBP_df_melt <- melt(BGBP_df)
 
 ## Update column names:
-colnames(E16kDa_df_melt) <- c("Life_stage", "Log2_values")
+colnames(BGBP_df_melt) <- c("Life_stage", "Log2_values")
 
-E16kDa_plot <- ggplot(E16kDa_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+BGBP_plot <- ggplot(BGBP_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("E16kDa") +
+                ggtitle("BGBP") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-E16kDa_plot <- E16kDa_plot +
+BGBP_plot <- BGBP_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+8. XP_003395541.1 - GPX
+
+```{r}
+## 
+GPX <- haem_data_df$`XP_003395541.1_probable_phospholipid_hydroperoxide_glutathione_peroxidase_[Bombus_terrestris]`
+GPX_gyne<- GPX[1:4]
+GPX_predia<- GPX[5:8]
+GPX_early_diapause<- GPX[9:12]
+GPX_late_diapause<- GPX[13:16]
+GPX_early_postdiapause<- GPX[17:20]
+GPX_late_postdiapause<- GPX[21:24]
+
+GPX_df <- cbind(GPX_gyne, GPX_predia,
+                GPX_early_diapause, GPX_late_diapause,
+                GPX_early_postdiapause, GPX_late_postdiapause)
+
+colnames(GPX_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+GPX_df <- as.data.frame(GPX_df)
+
+## Reshape for plotting:
+GPX_df_melt <- melt(GPX_df)
+
+## Update column names:
+colnames(GPX_df_melt) <- c("Life_stage", "Log2_values")
+
+GPX_plot <- ggplot(GPX_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("GPX") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+GPX_plot <- GPX_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
@@ -378,7 +392,51 @@ E16kDa_plot <- E16kDa_plot +
 
 ```{r}
 ## 
-Serpin_B3 <- haem_data_subset[,8]
+SOD <- haem_data_df$`XP_003397315.1_superoxide_dismutase_[Cu-Zn]_[Bombus_terrestris]`
+SOD_gyne<- SOD[1:4]
+SOD_predia<- SOD[5:8]
+SOD_early_diapause<- SOD[9:12]
+SOD_late_diapause<- SOD[13:16]
+SOD_early_postdiapause<- SOD[17:20]
+SOD_late_postdiapause<- SOD[21:24]
+
+SOD_df <- cbind(SOD_gyne, SOD_predia,
+                 SOD_early_diapause, SOD_late_diapause,
+                 SOD_early_postdiapause, SOD_late_postdiapause)
+
+colnames(SOD_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+SOD_df <- as.data.frame(SOD_df)
+
+## Reshape for plotting:
+SOD_df_melt <- melt(SOD_df)
+
+## Update column names:
+colnames(SOD_df_melt) <- c("Life_stage", "Log2_values")
+
+SOD_df_plot <- ggplot(SOD_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("SOD") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+SOD_df_plot <- SOD_df_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+9. XP_012174896.1 - Serine protease inhibitor 3
+
+```{r}
+## Serpin 3:
+Serpin_B3 <- haem_data_df$`XP_012174896.1_serine_protease_inhibitor_3-like_isoform_X2_[Bombus_terrestris]`
 Serpin_B3_gyne<- Serpin_B3[1:4]
 Serpin_B3_predia<- Serpin_B3[5:8]
 Serpin_B3_early_diapause<- Serpin_B3[9:12]
@@ -387,7 +445,7 @@ Serpin_B3_early_postdiapause<- Serpin_B3[17:20]
 Serpin_B3_late_postdiapause<- Serpin_B3[21:24]
 
 Serpin_B3_df <- cbind(Serpin_B3_gyne, Serpin_B3_predia,
-                 Serpin_B3_early_diapause, Serpin_B3_late_diapause,
+                Serpin_B3_early_diapause, Serpin_B3_late_diapause,
                  Serpin_B3_early_postdiapause, Serpin_B3_late_postdiapause)
 
 colnames(Serpin_B3_df) <- c("gyne", "prediapause", "early_diapause",
@@ -418,55 +476,11 @@ Serpin_B3_plot <- Serpin_B3_plot +
                 axis.text.x = element_blank())
 ```
 
-9. XP_012174896.1 - Serine protease inhibitor 3
-
-```{r}
-## Serpin 3:
-Serpin_3 <- haem_data_subset[,9]
-Serpin_3_gyne<- Serpin_3[1:4]
-Serpin_3_predia<- Serpin_3[5:8]
-Serpin_3_early_diapause<- Serpin_3[9:12]
-Serpin_3_late_diapause<- Serpin_3[13:16]
-Serpin_3_early_postdiapause<- Serpin_3[17:20]
-Serpin_3_late_postdiapause<- Serpin_3[21:24]
-
-Serpin_3_df <- cbind(Serpin_3_gyne, Serpin_3_predia,
-                 Serpin_3_early_diapause, Serpin_3_late_diapause,
-                 Serpin_3_early_postdiapause, Serpin_3_late_postdiapause)
-
-colnames(Serpin_3_df) <- c("gyne", "prediapause", "early_diapause",
-                       "late_diapause", "early_postdiapause", "late_postdiapause")
-
-## Make sure it is a dataframe:
-Serpin_3_df <- as.data.frame(Serpin_3_df)
-
-## Reshape for plotting:
-Serpin_3_df_melt <- melt(Serpin_3_df)
-
-## Update column names:
-colnames(Serpin_3_df_melt) <- c("Life_stage", "Log2_values")
-
-Serpin_3_plot <- ggplot(Serpin_3_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
-                geom_boxplot() +
-                xlab("Life stage") +
-                ylab("Log2 values") +
-                theme(legend.position="none") +
-                ggtitle("Serpin_3") +
-                scale_fill_brewer(type="qual", palette="RdBu") +
-                theme_bw() +
-                theme(legend.position="top")
-
-Serpin_3_plot <- Serpin_3_plot +
-                theme(axis.text=element_text(size=15),
-                axis.title= element_text(size=15,face="bold"), 
-                axis.text.x = element_blank())
-```
-
 10. XP_003401209.1 - Four_domain_proteases_inhibitor
 
 ```{r}
 ## Serpin 3:
-four_domain_inhib <- haem_data_subset[,10]
+four_domain_inhib <- haem_data_df$`XP_003401209.1_four-domain_proteases_inhibitor-like_[Bombus_terrestris]`
 four_domain_inhib_gyne<- four_domain_inhib[1:4]
 four_domain_inhib_predia<- four_domain_inhib[5:8]
 four_domain_inhib_early_diapause<- four_domain_inhib[9:12]
@@ -510,41 +524,41 @@ four_domain_inhib_plot <- four_domain_inhib_plot +
 
 ```{r}
 ## Serpin 3:
-chym_inhib_1 <- haem_data_subset[,11]
-chym_inhib_1_gyne<- chym_inhib_1[1:4]
-chym_inhib_1_predia<- chym_inhib_1[5:8]
-chym_inhib_1_early_diapause<- chym_inhib_1[9:12]
-chym_inhib_1_late_diapause<- chym_inhib_1[13:16]
-chym_inhib_1_early_postdiapause<- chym_inhib_1[17:20]
-chym_inhib_1_late_postdiapause<- chym_inhib_1[21:24]
+imet_inhib <- haem_data_df$`XP_003401251.1_inducible_metalloproteinase_inhibitor_protein-like_[Bombus_terrestris]`
+imet_inhib_gyne<- imet_inhib[1:4]
+imet_inhib_predia<- imet_inhib[5:8]
+imet_inhib_early_diapause<- imet_inhib[9:12]
+imet_inhib_late_diapause<- imet_inhib[13:16]
+imet_inhib_early_postdiapause<- imet_inhib[17:20]
+imet_inhib_late_postdiapause<- imet_inhib[21:24]
 
-chym_inhib_1_df <- cbind(chym_inhib_1_gyne, chym_inhib_1_predia,
-                 chym_inhib_1_early_diapause, chym_inhib_1_late_diapause,
-                 chym_inhib_1_early_postdiapause, chym_inhib_1_late_postdiapause)
+imet_inhib_df <- cbind(imet_inhib_gyne, imet_inhib_predia,
+                 imet_inhib_early_diapause, imet_inhib_late_diapause,
+                 imet_inhib_early_postdiapause, imet_inhib_late_postdiapause)
 
-colnames(chym_inhib_1_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(imet_inhib_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-chym_inhib_1_df <- as.data.frame(chym_inhib_1_df)
+imet_inhib_df <- as.data.frame(imet_inhib_df)
 
 ## Reshape for plotting:
-chym_inhib_1_df_melt <- melt(chym_inhib_1_df)
+imet_inhib_df_melt <- melt(imet_inhib_df)
 
 ## Update column names:
-colnames(chym_inhib_1_df_melt) <- c("Life_stage", "Log2_values")
+colnames(imet_inhib_df_melt) <- c("Life_stage", "Log2_values")
 
-chym_inhib_1_plot <- ggplot(chym_inhib_1_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+imet_inhib_plot <- ggplot(imet_inhib_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Chym_inhib_1") +
+                ggtitle("Met_inhib") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-chym_inhib_1_plot <- chym_inhib_1_plot +
+imet_inhib_plot <- imet_inhib_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
@@ -553,31 +567,31 @@ chym_inhib_1_plot <- chym_inhib_1_plot +
 12. XP_012172397.1	Chymotrypsin_inhibitor_2
 ```{r}
 ## Serpin 3:
-chym_inhib_2 <- haem_data_subset[,12]
-chym_inhib_2_gyne<- chym_inhib_2[1:4]
-chym_inhib_2_predia<- chym_inhib_2[5:8]
-chym_inhib_2_early_diapause<- chym_inhib_2[9:12]
-chym_inhib_2_late_diapause<- chym_inhib_2[13:16]
-chym_inhib_2_early_postdiapause<- chym_inhib_2[17:20]
-chym_inhib_2_late_postdiapause<- chym_inhib_2[21:24]
+chym_inhib <- haem_data_df$`XP_003401252.1_chymotrypsin_inhibitor_[Bombus_terrestris]`
+chym_inhib_gyne<- chym_inhib[1:4]
+chym_inhib_predia<- chym_inhib[5:8]
+chym_inhib_early_diapause<- chym_inhib[9:12]
+chym_inhib_late_diapause<- chym_inhib[13:16]
+chym_inhib_early_postdiapause<- chym_inhib[17:20]
+chym_inhib_late_postdiapause<- chym_inhib[21:24]
 
-chym_inhib_2_df <- cbind(chym_inhib_2_gyne, chym_inhib_2_predia,
-                 chym_inhib_2_early_diapause, chym_inhib_2_late_diapause,
-                 chym_inhib_2_early_postdiapause, chym_inhib_2_late_postdiapause)
+chym_inhib_df <- cbind(chym_inhib_gyne, chym_inhib_predia,
+                 chym_inhib_early_diapause, chym_inhib_late_diapause,
+                 chym_inhib_early_postdiapause, chym_inhib_late_postdiapause)
 
-colnames(chym_inhib_2_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(chym_inhib_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-chym_inhib_2_df <- as.data.frame(chym_inhib_2_df)
+chym_inhib_df <- as.data.frame(chym_inhib_df)
 
 ## Reshape for plotting:
-chym_inhib_2_df_melt <- melt(chym_inhib_2_df)
+chym_inhib_df_melt <- melt(chym_inhib_df)
 
 ## Update column names:
-colnames(chym_inhib_2_df_melt) <- c("Life_stage", "Log2_values")
+colnames(chym_inhib_df_melt) <- c("Life_stage", "Log2_values")
 
-chym_inhib_2_plot <- ggplot(chym_inhib_2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+chym_inhib_plot <- ggplot(chym_inhib_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
@@ -587,7 +601,7 @@ chym_inhib_2_plot <- ggplot(chym_inhib_2_df_melt, aes(x=Life_stage, y=Log2_value
                 theme_bw() +
                 theme(legend.position="top")
 
-chym_inhib_2_plot <- chym_inhib_2_plot +
+chym_inhib_plot <- chym_inhib_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
@@ -597,7 +611,359 @@ chym_inhib_2_plot <- chym_inhib_2_plot +
 
 ```{r}
 ## 
-PGRP2 <- haem_data_subset[,4]
+SPTZ <- haem_data_df$`XP_003402363.1_protein_spaetzle-like_[Bombus_terrestris]`
+SPTZ_gyne<- SPTZ[1:4]
+SPTZ_predia<- SPTZ[5:8]
+SPTZ_early_diapause<- SPTZ[9:12]
+SPTZ_late_diapause<- SPTZ[13:16]
+SPTZ_early_postdiapause<- SPTZ[17:20]
+SPTZ_late_postdiapause<- SPTZ[21:24]
+
+SPTZ_df <- cbind(SPTZ_gyne, SPTZ_predia,
+                 SPTZ_early_diapause, SPTZ_late_diapause,
+                 SPTZ_early_postdiapause, SPTZ_late_postdiapause)
+
+colnames(SPTZ_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+SPTZ_df <- as.data.frame(SPTZ_df)
+
+## Reshape for plotting:
+SPTZ_df_melt <- melt(SPTZ_df)
+
+## Update column names:
+colnames(SPTZ_df_melt) <- c("Life_stage", "Log2_values")
+
+SPTZ_plot <- ggplot(SPTZ_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("SPTZ") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+SPTZ_plot <- SPTZ_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+2. XP_012173977.1 - spaetzle
+
+```{r}
+## 
+TDX <- haem_data_df$`XP_012164907.1_thioredoxin-2_[Bombus_terrestris]`
+TDX_gyne<- TDX[1:4]
+TDX_predia<- TDX[5:8]
+TDX_early_diapause<- TDX[9:12]
+TDX_late_diapause<- TDX[13:16]
+TDX_early_postdiapause<- TDX[17:20]
+TDX_late_postdiapause<- TDX[21:24]
+
+TDX_df <- cbind(TDX_gyne, TDX_predia,
+                 TDX_early_diapause, TDX_late_diapause,
+                 TDX_early_postdiapause, TDX_late_postdiapause)
+
+colnames(TDX_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+TDX_df <- as.data.frame(TDX_df)
+
+## Reshape for plotting:
+TDX_df_melt <- melt(TDX_df)
+
+## Update column names:
+colnames(TDX_df_melt) <- c("Life_stage", "Log2_values")
+
+TDX_plot <- ggplot(TDX_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("TDX") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+TDX_plot <- TDX_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+1. XP_012167926.1 - spaetzle_2 
+
+```{r}
+## 
+APD <- haem_data_df$`XP_012166489.1_apolipoprotein_D-like_[Bombus_terrestris]`
+APD_gyne<- APD[1:4]
+APD_predia<- APD[5:8]
+APD_early_diapause<- APD[9:12]
+APD_late_diapause<- APD[13:16]
+APD_early_postdiapause<- APD[17:20]
+APD_late_postdiapause<- APD[21:24]
+
+APD_df <- cbind(APD_gyne, APD_predia,
+                 APD_early_diapause, APD_late_diapause,
+                 APD_early_postdiapause, APD_late_postdiapause)
+
+colnames(APD_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+APD_df <- as.data.frame(APD_df)
+
+## Reshape for plotting:
+APD_df_melt <- melt(APD_df)
+
+## Update column names:
+colnames(APD_df_melt) <- c("Life_stage", "Log2_values")
+
+APD_plot <- ggplot(APD_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("APD") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+APD_plot <- APD_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+17. XP_012170668.1 - lysozyme 
+
+```{r}
+## 
+SPTZ_like <- haem_data_df$`XP_012167926.1_LOW_QUALITY_PROTEIN:_protein_spaetzle-like_[Bombus_terrestris]`
+SPTZ_like_gyne<- SPTZ_like[1:4]
+SPTZ_like_predia<- SPTZ_like[5:8]
+SPTZ_like_early_diapause<- SPTZ_like[9:12]
+SPTZ_like_late_diapause<- SPTZ_like[13:16]
+SPTZ_like_early_postdiapause<- SPTZ_like[17:20]
+SPTZ_like_late_postdiapause<- SPTZ_like[21:24]
+
+SPTZ_like_df <- cbind(SPTZ_like_gyne, SPTZ_like_predia,
+                 SPTZ_like_early_diapause, SPTZ_like_late_diapause,
+                 SPTZ_like_early_postdiapause, SPTZ_like_late_postdiapause)
+
+colnames(SPTZ_like_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+SPTZ_like_df <- as.data.frame(SPTZ_like_df)
+
+## Reshape for plotting:
+SPTZ_like_df_melt <- melt(SPTZ_like_df)
+
+## Update column names:
+colnames(SPTZ_like_df_melt) <- c("Life_stage", "Log2_values")
+
+SPTZ_like_plot <- ggplot(SPTZ_like_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("SPTZ_like") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+SPTZ_like_plot <- SPTZ_like_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+
+```{r}
+## 
+ASPN <- haem_data_df$`XP_012169463.2_LOW_QUALITY_PROTEIN:_alaserpin_[Bombus_terrestris]`
+ASPN_gyne<- ASPN[1:4]
+ASPN_predia<- ASPN[5:8]
+ASPN_early_diapause<- ASPN[9:12]
+ASPN_late_diapause<- ASPN[13:16]
+ASPN_early_postdiapause<- ASPN[17:20]
+ASPN_late_postdiapause<- ASPN[21:24]
+
+ASPN_df <- cbind(ASPN_gyne, ASPN_predia,
+                 ASPN_early_diapause, ASPN_late_diapause,
+                 ASPN_early_postdiapause, ASPN_late_postdiapause)
+
+colnames(ASPN_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+ASPN_df <- as.data.frame(ASPN_df)
+
+## Reshape for plotting:
+ASPN_df_melt <- melt(ASPN_df)
+
+## Update column names:
+colnames(ASPN_df_melt) <- c("Life_stage", "Log2_values")
+
+ASPN_plot <- ggplot(ASPN_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("ASPN") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+ASPN_plot <- ASPN_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+```
+
+
+```{r}
+## 
+LYSO <- haem_data_df$`XP_012170668.1_lysozyme-like_[Bombus_terrestris]`
+LYSO_gyne<- LYSO[1:4]
+LYSO_predia<- LYSO[5:8]
+LYSO_early_diapause<- LYSO[9:12]
+LYSO_late_diapause<- LYSO[13:16]
+LYSO_early_postdiapause<- LYSO[17:20]
+LYSO_late_postdiapause<- LYSO[21:24]
+
+LYSO_df <- cbind(LYSO_gyne, LYSO_predia,
+                 LYSO_early_diapause, LYSO_late_diapause,
+                 LYSO_early_postdiapause, LYSO_late_postdiapause)
+
+colnames(LYSO_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+LYSO_df <- as.data.frame(LYSO_df)
+
+## Reshape for plotting:
+LYSO_df_melt <- melt(LYSO_df)
+
+## Update column names:
+colnames(LYSO_df_melt) <- c("Life_stage", "Log2_values")
+
+LYSO_plot <- ggplot(LYSO_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("LYSO") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+LYSO_plot <- LYSO_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+```{r}
+## 
+PGRPSC2<- haem_data_df$`XP_012170795.1_peptidoglycan-recognition_protein_SC2-like_[Bombus_terrestris]`
+PGRPSC2_gyne<- PGRPSC2[1:4]
+PGRPSC2_predia<- PGRPSC2[5:8]
+PGRPSC2_early_diapause<- PGRPSC2[9:12]
+PGRPSC2_late_diapause<- PGRPSC2[13:16]
+PGRPSC2_early_postdiapause<- PGRPSC2[17:20]
+PGRPSC2_late_postdiapause<- PGRPSC2[21:24]
+
+PGRPSC2_df <- cbind(PGRPSC2_gyne, PGRPSC2_predia,
+                 PGRPSC2_early_diapause, PGRPSC2_late_diapause,
+                 PGRPSC2_early_postdiapause, PGRPSC2_late_postdiapause)
+
+colnames(PGRPSC2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+PGRPSC2_df <- as.data.frame(PGRPSC2_df)
+
+## Reshape for plotting:
+PGRPSC2_df_melt <- melt(PGRPSC2_df)
+
+## Update column names:
+colnames(PGRPSC2_df_melt) <- c("Life_stage", "Log2_values")
+
+PGRPSC2_plot <- ggplot(PGRPSC2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("PGRPSC2") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+PGRPSC2_plot <- PGRPSC2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+```{r}
+## 
+CI_like <- haem_data_df$`XP_003401252.1_chymotrypsin_inhibitor_[Bombus_terrestris]`
+CI_like_gyne<- CI_like[1:4]
+CI_like_predia<- CI_like[5:8]
+CI_like_early_diapause<- CI_like[9:12]
+CI_like_late_diapause<- CI_like[13:16]
+CI_like_early_postdiapause<- CI_like[17:20]
+CI_like_late_postdiapause<- CI_like[21:24]
+
+CI_like_df <- cbind(CI_like_gyne, CI_like_predia,
+                 CI_like_early_diapause, CI_like_late_diapause,
+                 CI_like_early_postdiapause, CI_like_late_postdiapause)
+
+colnames(CI_like_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+CI_like_df <- as.data.frame(CI_like_df)
+
+## Reshape for plotting:
+CI_like_df_melt <- melt(CI_like_df)
+
+## Update column names:
+colnames(CI_like_df_melt) <- c("Life_stage", "Log2_values")
+
+CI_like_plot <- ggplot(CI_like_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("CI_like") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+CI_like_plot <- CI_like_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+```{r}
+## 
+PGRP2 <- haem_data_df$`XP_012173324.1_peptidoglycan-recognition_protein_2-like_[Bombus_terrestris]`
 PGRP2_gyne<- PGRP2[1:4]
 PGRP2_predia<- PGRP2[5:8]
 PGRP2_early_diapause<- PGRP2[9:12]
@@ -637,179 +1003,307 @@ PGRP2_plot <- PGRP2_plot +
                 axis.text.x = element_blank())
 ```
 
-2. XP_012173977.1 - spaetzle
-
 ```{r}
 ## 
-spaetzle <- haem_data_subset[,2]
-spaetzle_gyne<- spaetzle[1:4]
-spaetzle_predia<- spaetzle[5:8]
-spaetzle_early_diapause<- spaetzle[9:12]
-spaetzle_late_diapause<- spaetzle[13:16]
-spaetzle_early_postdiapause<- spaetzle[17:20]
-spaetzle_late_postdiapause<- spaetzle[21:24]
+MD2 <- haem_data_df$`XP_003400229.1_MD-2-related_lipid-recognition_protein-like_[Bombus_terrestris]`
+MD2_gyne<- MD2[1:4]
+MD2_predia<- MD2[5:8]
+MD2_early_diapause<- MD2[9:12]
+MD2_late_diapause<- MD2[13:16]
+MD2_early_postdiapause<- MD2[17:20]
+MD2_late_postdiapause<- MD2[21:24]
 
-spaetzle_df <- cbind(spaetzle_gyne, spaetzle_predia,
-                 spaetzle_early_diapause, spaetzle_late_diapause,
-                 spaetzle_early_postdiapause, spaetzle_late_postdiapause)
+MD2_df <- cbind(MD2_gyne, MD2_predia,
+                 MD2_early_diapause, MD2_late_diapause,
+                 MD2_early_postdiapause, MD2_late_postdiapause)
 
-colnames(spaetzle_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(MD2_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-spaetzle_df <- as.data.frame(spaetzle_df)
+MD2_df <- as.data.frame(MD2_df)
 
 ## Reshape for plotting:
-spaetzle_df_melt <- melt(spaetzle_df)
+MD2_df_melt <- melt(MD2_df)
 
 ## Update column names:
-colnames(spaetzle_df_melt) <- c("Life_stage", "Log2_values")
+colnames(MD2_df_melt) <- c("Life_stage", "Log2_values")
 
-spaetzle_plot <- ggplot(spaetzle_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+MD2_plot <- ggplot(MD2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Spaetzle") +
+                ggtitle("MD2") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-spaetzle_plot <- spaetzle_plot +
+MD2_plot <- MD2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+```{r}
+## 
+SOT14 <- haem_data_df$`XP_012175299.1_suppressor_of_tumorigenicity_14_protein-like_[Bombus_terrestris]`
+SOT14_gyne<- SOT14[1:4]
+SOT14_predia<- SOT14[5:8]
+SOT14_early_diapause<- SOT14[9:12]
+SOT14_late_diapause<- SOT14[13:16]
+SOT14_early_postdiapause<- SOT14[17:20]
+SOT14_late_postdiapause<- SOT14[21:24]
+
+SOT14_df <- cbind(SOT14_gyne, SOT14_predia,
+                 SOT14_early_diapause, SOT14_late_diapause,
+                 SOT14_early_postdiapause, SOT14_late_postdiapause)
+
+colnames(SOT14_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+SOT14_df <- as.data.frame(SOT14_df)
+
+## Reshape for plotting:
+SOT14_df_melt <- melt(SOT14_df)
+
+## Update column names:
+colnames(SOT14_df_melt) <- c("Life_stage", "Log2_values")
+
+SOT14_plot <- ggplot(SOT14_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("SOT14") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+SOT14_plot <- SOT14_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
 ```
 
-1. XP_012167926.1 - spaetzle_2 
 
 ```{r}
 ## 
-spaetzle_2 <- haem_data_subset[,1]
-spaetzle_2_gyne<- spaetzle_2[1:4]
-spaetzle_2_predia<- spaetzle_2[5:8]
-spaetzle_2_early_diapause<- spaetzle_2[9:12]
-spaetzle_2_late_diapause<- spaetzle_2[13:16]
-spaetzle_2_early_postdiapause<- spaetzle_2[17:20]
-spaetzle_2_late_postdiapause<- spaetzle_2[21:24]
+EASTER <- haem_data_df$`XP_020718755.1_serine_protease_easter-like_[Bombus_terrestris]`
+EASTER_gyne<- EASTER[1:4]
+EASTER_predia<- EASTER[5:8]
+EASTER_early_diapause<- EASTER[9:12]
+EASTER_late_diapause<- EASTER[13:16]
+EASTER_early_postdiapause<- EASTER[17:20]
+EASTER_late_postdiapause<- EASTER[21:24]
 
-spaetzle_2_df <- cbind(spaetzle_2_gyne, spaetzle_2_predia,
-                 spaetzle_2_early_diapause, spaetzle_2_late_diapause,
-                 spaetzle_2_early_postdiapause, spaetzle_2_late_postdiapause)
+EASTER_df <- cbind(EASTER_gyne, EASTER_predia,
+                 EASTER_early_diapause, EASTER_late_diapause,
+                 EASTER_early_postdiapause, EASTER_late_postdiapause)
 
-colnames(spaetzle_2_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(EASTER_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-spaetzle_2_df <- as.data.frame(spaetzle_2_df)
+EASTER_df <- as.data.frame(EASTER_df)
 
 ## Reshape for plotting:
-spaetzle_2_df_melt <- melt(spaetzle_2_df)
+EASTER_df_melt <- melt(EASTER_df)
 
 ## Update column names:
-colnames(spaetzle_2_df_melt) <- c("Life_stage", "Log2_values")
+colnames(EASTER_df_melt) <- c("Life_stage", "Log2_values")
 
-spaetzle_2_plot <- ggplot(spaetzle_2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+EASTER_plot <- ggplot(EASTER_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Spaetzle_2") +
+                ggtitle("EASTER") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-spaetzle_2_plot <- spaetzle_2_plot +
+EASTER_plot <- EASTER_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+```{r}
+## 
+ACI2 <- haem_data_df$`XP_020721343.1_antichymotrypsin-2_[Bombus_terrestris]`
+ACI2_gyne<- ACI2[1:4]
+ACI2_predia<- ACI2[5:8]
+ACI2_early_diapause<- ACI2[9:12]
+ACI2_late_diapause<- ACI2[13:16]
+ACI2_early_postdiapause<- ACI2[17:20]
+ACI2_late_postdiapause<- ACI2[21:24]
+
+ACI2_df <- cbind(ACI2_gyne, ACI2_predia,
+                 ACI2_early_diapause, ACI2_late_diapause,
+                 ACI2_early_postdiapause, ACI2_late_postdiapause)
+
+colnames(ACI2_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+ACI2_df <- as.data.frame(ACI2_df)
+
+## Reshape for plotting:
+ACI2_df_melt <- melt(ACI2_df)
+
+## Update column names:
+colnames(ACI2_df_melt) <- c("Life_stage", "Log2_values")
+
+ACI2_plot <- ggplot(ACI2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("ACI2") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+ACI2_plot <- ACI2_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"), 
+                axis.text.x = element_blank())
+
+```
+
+
+
+```{r}
+## 
+EASTER_like <- haem_data_df$`XP_020718755.1_serine_protease_easter-like_[Bombus_terrestris]`
+EASTER_like_gyne<- EASTER_like[1:4]
+EASTER_like_predia<- EASTER_like[5:8]
+EASTER_like_early_diapause<- EASTER_like[9:12]
+EASTER_like_late_diapause<- EASTER_like[13:16]
+EASTER_like_early_postdiapause<- EASTER_like[17:20]
+EASTER_like_late_postdiapause<- EASTER_like[21:24]
+
+EASTER_like_df <- cbind(EASTER_like_gyne, EASTER_like_predia,
+                 EASTER_like_early_diapause, EASTER_like_late_diapause,
+                 EASTER_like_early_postdiapause, EASTER_like_late_postdiapause)
+
+colnames(EASTER_like_df) <- c("gyne", "prediapause", "early_diapause",
+                       "late_diapause", "early_postdiapause", "late_postdiapause")
+
+## Make sure it is a dataframe:
+EASTER_like_df <- as.data.frame(EASTER_like_df)
+
+## Reshape for plotting:
+EASTER_like_df_melt <- melt(EASTER_like_df)
+
+## Update column names:
+colnames(EASTER_like_df_melt) <- c("Life_stage", "Log2_values")
+
+EASTER_like_plot <- ggplot(EASTER_like_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Log2 values") +
+                theme(legend.position="none") +
+                ggtitle("EASTER_like") +
+                scale_fill_brewer(type="qual", palette="RdBu") +
+                theme_bw() +
+                theme(legend.position="top")
+
+EASTER_like_plot <- EASTER_like_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
 ```
 
-17. XP_012170668.1 - lysozyme 
 
 ```{r}
 ## 
-lysozyme <- haem_data_subset[,17]
-lysozyme_gyne<- lysozyme[1:4]
-lysozyme_predia<- lysozyme[5:8]
-lysozyme_early_diapause<- lysozyme[9:12]
-lysozyme_late_diapause<- lysozyme[13:16]
-lysozyme_early_postdiapause<- lysozyme[17:20]
-lysozyme_late_postdiapause<- lysozyme[21:24]
+ACI2 <- haem_data_df$`XP_020721343.1_antichymotrypsin-2_[Bombus_terrestris]`
+ACI2_gyne<- ACI2[1:4]
+ACI2_predia<- ACI2[5:8]
+ACI2_early_diapause<- ACI2[9:12]
+ACI2_late_diapause<- ACI2[13:16]
+ACI2_early_postdiapause<- ACI2[17:20]
+ACI2_late_postdiapause<- ACI2[21:24]
 
-lysozyme_df <- cbind(lysozyme_gyne, lysozyme_predia,
-                 lysozyme_early_diapause, lysozyme_late_diapause,
-                 lysozyme_early_postdiapause, lysozyme_late_postdiapause)
+ACI2_df <- cbind(ACI2_gyne, ACI2_predia,
+                 ACI2_early_diapause, ACI2_late_diapause,
+                 ACI2_early_postdiapause, ACI2_late_postdiapause)
 
-colnames(lysozyme_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(ACI2_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-lysozyme_df <- as.data.frame(lysozyme_df)
+ACI2_df <- as.data.frame(ACI2_df)
 
 ## Reshape for plotting:
-lysozyme_df_melt <- melt(lysozyme_df)
+ACI2_df_melt <- melt(ACI2_df)
 
 ## Update column names:
-colnames(lysozyme_df_melt) <- c("Life_stage", "Log2_values")
+colnames(ACI2_df_melt) <- c("Life_stage", "Log2_values")
 
-lysozyme_plot <- ggplot(lysozyme_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+ACI2_plot <- ggplot(ACI2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Lysozyme") +
+                ggtitle("ACI2") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
-lysozyme_plot <- lysozyme_plot +
+ACI2_plot <- ACI2_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
-
 ```
 
 3. XP_012170795.1 - PGRPS2
 
 ```{r}
 ## 
-PGRPS2 <- haem_data_subset[,3]
-PGRPS2_gyne<- PGRPS2[1:4]
-PGRPS2_predia<- PGRPS2[5:8]
-PGRPS2_early_diapause<- PGRPS2[9:12]
-PGRPS2_late_diapause<- PGRPS2[13:16]
-PGRPS2_early_postdiapause<- PGRPS2[17:20]
-PGRPS2_late_postdiapause<- PGRPS2[21:24]
+FIB <- haem_data_df$`XP_020722610.1_fibrillin-2_[Bombus_terrestris]`
+FIB_gyne<- FIB[1:4]
+FIB_predia<- FIB[5:8]
+FIB_early_diapause<- FIB[9:12]
+FIB_late_diapause<- FIB[13:16]
+FIB_early_postdiapause<- FIB[17:20]
+FIB_late_postdiapause<- FIB[21:24]
 
-PGRPS2_df <- cbind(PGRPS2_gyne, PGRPS2_predia,
-                 PGRPS2_early_diapause, PGRPS2_late_diapause,
-                 PGRPS2_early_postdiapause, PGRPS2_late_postdiapause)
+FIB_df <- cbind(FIB_gyne, FIB_predia,
+                 FIB_early_diapause, FIB_late_diapause,
+                 FIB_early_postdiapause, FIB_late_postdiapause)
 
-colnames(PGRPS2_df) <- c("gyne", "prediapause", "early_diapause",
+colnames(FIB_df) <- c("gyne", "prediapause", "early_diapause",
                        "late_diapause", "early_postdiapause", "late_postdiapause")
 
 ## Make sure it is a dataframe:
-PGRPS2_df <- as.data.frame(PGRPS2_df)
+FIB_df <- as.data.frame(FIB_df)
 
 ## Reshape for plotting:
-PGRPS2_df_melt <- melt(PGRPS2_df)
+FIB_df_melt <- melt(FIB_df)
 
 ## Update column names:
-colnames(PGRPS2_df_melt) <- c("Life_stage", "Log2_values")
+colnames(FIB_df_melt) <- c("Life_stage", "Log2_values")
 
-PGRPS2_plot <- ggplot(PGRPS2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
+FIB_plot <- ggplot(FIB_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("PGRPS2") +
+                ggtitle("FIB") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
 
 
-PGRPS2_plot <- PGRPS2_plot +
+FIB_plot <- FIB_plot +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
@@ -819,25 +1313,39 @@ PGRPS2_plot <- PGRPS2_plot +
 
 ```{r}
 ## 
-ggarrange(spaetzle_plot, 
-          spaetzle_2_plot, 
-          PGRPS2_plot, 
+ggarrange(SPTZ_plot, 
+          SPTZ_like_plot, 
+          EASTER_like_plot,
+          EASTER_plot,
           PGRP2_plot, 
-          NPC2_plot, 
-          MDL2_plot, 
+          PGRPSC2_plot,
+          SOT14_plot,
+          LYSO_plot,
+          MD2_plot, 
           LRRP_plot, 
-          E16kDa_plot, 
-          Serpin_B3_plot, 
-          Serpin_3_plot,
+          Serpin_B3_plot,
           four_domain_inhib_plot,
-          chym_inhib_1_plot,
-          chym_inhib_2_plot,
+          CI_like_plot,
+          ACI2_plot,
           hymenoptaecin_plot,
           defensin_plot,
           abaecin_plot,
-          lysozyme_plot,
-          ncol = 4, 
-          nrow = 5, 
+          apidaecin_plot,
+          SOD_df_plot,
+          TDX_plot,
+          GPX_plot,
+          FIB_plot,
+          chym_inhib_plot,
+          BGBP_plot,
+          APD_plot,
+          ASPN_plot,
+          ncol = 5, 
+          nrow = 6, 
           common.legend = TRUE)
+
+ggsave(file = "results/test.png",
+       width = 20,
+       height = 20)
 ```
+
 
