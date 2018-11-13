@@ -24,8 +24,8 @@ for (lib in libraries) {
     }
 }
 
+## Create results directory:
 dir.create("results")
-
 ```
 
 1. Read in input data:
@@ -90,7 +90,7 @@ abaecin_plot <- ggplot(abaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Li
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
-                ylim(c(24,35)) +
+                #ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Abaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -134,7 +134,7 @@ defensin_plot <- ggplot(defensin_df_melt, aes(x=Life_stage, y=Log2_values, fill=
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
-                ylim(c(24,35)) +
+                 #ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Defensin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -180,7 +180,7 @@ hymenoptaecin_plot <- ggplot(hymenoptaecin_df_melt, aes(x=Life_stage, y=Log2_val
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
-                ylim(c(24,35)) +
+                 #ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Hymenoptaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -225,7 +225,7 @@ apidaecin_plot <- ggplot(apidaecin_df_melt, aes(x=Life_stage, y=Log2_values, fil
                 geom_boxplot() +
                 xlab("Life stage") +
                 ylab("Log2 values") +
-                ylim(c(24,35)) +
+                 #ylim(c(24,35)) +
                 theme(legend.position="none") +
                 ggtitle("Apidaecin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
@@ -287,7 +287,7 @@ LRRP_plot <- ggplot(LRRP_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("LRRP") +
+                ggtitle("LRRP70") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -333,7 +333,7 @@ BGBP_plot <- ggplot(BGBP_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("BGBP") +
+                ggtitle("BGBP1") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -377,7 +377,7 @@ GPX_plot <- ggplot(GPX_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("GPX") +
+                ggtitle("Glutathione peroxidase") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -421,7 +421,7 @@ SOD_df_plot <- ggplot(SOD_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_st
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("SOD") +
+                ggtitle("Superoxide Dismutase") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -509,7 +509,7 @@ four_domain_inhib_plot <- ggplot(four_domain_inhib_df_melt, aes(x=Life_stage, y=
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Four_domain_inhib") +
+                ggtitle("Four_domain_inhibitor") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -520,7 +520,7 @@ four_domain_inhib_plot <- four_domain_inhib_plot +
                 axis.text.x = element_blank())
 ```
 
-11. AFX62369.1 - Chymotrypsin_inhibitor
+11. XP_003401251.1 - inducible_metalloproteinase_inhibitor
 
 ```{r}
 ## Serpin 3:
@@ -553,7 +553,7 @@ imet_inhib_plot <- ggplot(imet_inhib_df_melt, aes(x=Life_stage, y=Log2_values, f
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Met_inhib") +
+                ggtitle("Metalloproteinase_inhibitor") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -564,9 +564,10 @@ imet_inhib_plot <- imet_inhib_plot +
                 axis.text.x = element_blank())
 ```
 
-12. XP_012172397.1	Chymotrypsin_inhibitor_2
+12. XP_003401252.1	Chymotrypsin_inhibitor
+
 ```{r}
-## Serpin 3:
+## Chymotrypsin_inhibitor:
 chym_inhib <- haem_data_df$`XP_003401252.1_chymotrypsin_inhibitor_[Bombus_terrestris]`
 chym_inhib_gyne<- chym_inhib[1:4]
 chym_inhib_predia<- chym_inhib[5:8]
@@ -596,7 +597,7 @@ chym_inhib_plot <- ggplot(chym_inhib_df_melt, aes(x=Life_stage, y=Log2_values, f
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("Chym_inhib_2") +
+                ggtitle("Chymotrypsin_inhibitor_2") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -607,7 +608,7 @@ chym_inhib_plot <- chym_inhib_plot +
                 axis.text.x = element_blank())
 ```
 
-4. XP_012173325.1 - peptidoglycan-recognition protein 2
+4. XP_003402363.1 - protein_spaetzle
 
 ```{r}
 ## 
@@ -640,7 +641,7 @@ SPTZ_plot <- ggplot(SPTZ_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("SPTZ") +
+                ggtitle("Spaetzle") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -651,10 +652,10 @@ SPTZ_plot <- SPTZ_plot +
                 axis.text.x = element_blank())
 ```
 
-2. XP_012173977.1 - spaetzle
+2. XP_012164907.1 - thioredoxin-2
 
 ```{r}
-## 
+## thioredoxin-2:
 TDX <- haem_data_df$`XP_012164907.1_thioredoxin-2_[Bombus_terrestris]`
 TDX_gyne<- TDX[1:4]
 TDX_predia<- TDX[5:8]
@@ -684,7 +685,7 @@ TDX_plot <- ggplot(TDX_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("TDX") +
+                ggtitle("Thioredoxin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -695,7 +696,7 @@ TDX_plot <- TDX_plot +
                 axis.text.x = element_blank())
 ```
 
-1. XP_012167926.1 - spaetzle_2 
+1. XP_012166489.1 - apolipoprotein_D 
 
 ```{r}
 ## 
@@ -728,7 +729,7 @@ APD_plot <- ggplot(APD_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("APD") +
+                ggtitle("Apolipoprotein_D") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -739,7 +740,7 @@ APD_plot <- APD_plot +
                 axis.text.x = element_blank())
 ```
 
-17. XP_012170668.1 - lysozyme 
+17. XP_012167926.1 - protein_spaetzle 
 
 ```{r}
 ## 
@@ -772,7 +773,7 @@ SPTZ_like_plot <- ggplot(SPTZ_like_df_melt, aes(x=Life_stage, y=Log2_values, fil
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("SPTZ_like") +
+                ggtitle("Spaetzle_like") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -784,10 +785,10 @@ SPTZ_like_plot <- SPTZ_like_plot +
 
 ```
 
-
+XP_012169463.2 - Alaserpin:
 
 ```{r}
-## 
+## Alaserpin:
 ASPN <- haem_data_df$`XP_012169463.2_LOW_QUALITY_PROTEIN:_alaserpin_[Bombus_terrestris]`
 ASPN_gyne<- ASPN[1:4]
 ASPN_predia<- ASPN[5:8]
@@ -817,7 +818,7 @@ ASPN_plot <- ggplot(ASPN_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("ASPN") +
+                ggtitle("Alaserpin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -828,9 +829,10 @@ ASPN_plot <- ASPN_plot +
                 axis.text.x = element_blank())
 ```
 
+XP_012170668.1 - Lysozyme
 
 ```{r}
-## 
+## Lysozyme: 
 LYSO <- haem_data_df$`XP_012170668.1_lysozyme-like_[Bombus_terrestris]`
 LYSO_gyne<- LYSO[1:4]
 LYSO_predia<- LYSO[5:8]
@@ -860,7 +862,7 @@ LYSO_plot <- ggplot(LYSO_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("LYSO") +
+                ggtitle("Lysozyme") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -872,6 +874,7 @@ LYSO_plot <- LYSO_plot +
 
 ```
 
+XP_012170795.1 - PGRPSC2
 
 ```{r}
 ## 
@@ -916,6 +919,7 @@ PGRPSC2_plot <- PGRPSC2_plot +
 
 ```
 
+XP_003401252.1 - Chymotrypsin inhibitor
 
 ```{r}
 ## 
@@ -948,7 +952,7 @@ CI_like_plot <- ggplot(CI_like_df_melt, aes(x=Life_stage, y=Log2_values, fill=Li
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("CI_like") +
+                ggtitle("Chymotrypsin_inhibitor_like") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -960,9 +964,10 @@ CI_like_plot <- CI_like_plot +
 
 ```
 
+XP_012173324.1 - PGRP2
 
 ```{r}
-## 
+## PGRP2:
 PGRP2 <- haem_data_df$`XP_012173324.1_peptidoglycan-recognition_protein_2-like_[Bombus_terrestris]`
 PGRP2_gyne<- PGRP2[1:4]
 PGRP2_predia<- PGRP2[5:8]
@@ -1003,8 +1008,10 @@ PGRP2_plot <- PGRP2_plot +
                 axis.text.x = element_blank())
 ```
 
+XP_003400229.1 - MD2
+
 ```{r}
-## 
+## MD2:
 MD2 <- haem_data_df$`XP_003400229.1_MD-2-related_lipid-recognition_protein-like_[Bombus_terrestris]`
 MD2_gyne<- MD2[1:4]
 MD2_predia<- MD2[5:8]
@@ -1046,9 +1053,10 @@ MD2_plot <- MD2_plot +
 
 ```
 
+XP_012175299.1 - SOT14
 
 ```{r}
-## 
+## SOT14: 
 SOT14 <- haem_data_df$`XP_012175299.1_suppressor_of_tumorigenicity_14_protein-like_[Bombus_terrestris]`
 SOT14_gyne<- SOT14[1:4]
 SOT14_predia<- SOT14[5:8]
@@ -1089,10 +1097,11 @@ SOT14_plot <- SOT14_plot +
                 axis.text.x = element_blank())
 ```
 
+XP_020718756.1 - Easter:
 
 ```{r}
-## 
-EASTER <- haem_data_df$`XP_020718755.1_serine_protease_easter-like_[Bombus_terrestris]`
+## Easter: 
+EASTER <- haem_data_df$`XP_020718756.1_serine_protease_easter_[Bombus_terrestris]`
 EASTER_gyne<- EASTER[1:4]
 EASTER_predia<- EASTER[5:8]
 EASTER_early_diapause<- EASTER[9:12]
@@ -1121,7 +1130,7 @@ EASTER_plot <- ggplot(EASTER_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("EASTER") +
+                ggtitle("Easter") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -1133,54 +1142,10 @@ EASTER_plot <- EASTER_plot +
 
 ```
 
+XP_020718755.1 - Easter_like:
 
 ```{r}
-## 
-ACI2 <- haem_data_df$`XP_020721343.1_antichymotrypsin-2_[Bombus_terrestris]`
-ACI2_gyne<- ACI2[1:4]
-ACI2_predia<- ACI2[5:8]
-ACI2_early_diapause<- ACI2[9:12]
-ACI2_late_diapause<- ACI2[13:16]
-ACI2_early_postdiapause<- ACI2[17:20]
-ACI2_late_postdiapause<- ACI2[21:24]
-
-ACI2_df <- cbind(ACI2_gyne, ACI2_predia,
-                 ACI2_early_diapause, ACI2_late_diapause,
-                 ACI2_early_postdiapause, ACI2_late_postdiapause)
-
-colnames(ACI2_df) <- c("gyne", "prediapause", "early_diapause",
-                       "late_diapause", "early_postdiapause", "late_postdiapause")
-
-## Make sure it is a dataframe:
-ACI2_df <- as.data.frame(ACI2_df)
-
-## Reshape for plotting:
-ACI2_df_melt <- melt(ACI2_df)
-
-## Update column names:
-colnames(ACI2_df_melt) <- c("Life_stage", "Log2_values")
-
-ACI2_plot <- ggplot(ACI2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
-                geom_boxplot() +
-                xlab("Life stage") +
-                ylab("Log2 values") +
-                theme(legend.position="none") +
-                ggtitle("ACI2") +
-                scale_fill_brewer(type="qual", palette="RdBu") +
-                theme_bw() +
-                theme(legend.position="top")
-
-ACI2_plot <- ACI2_plot +
-                theme(axis.text=element_text(size=15),
-                axis.title= element_text(size=15,face="bold"), 
-                axis.text.x = element_blank())
-
-```
-
-
-
-```{r}
-## 
+## Easter_like:
 EASTER_like <- haem_data_df$`XP_020718755.1_serine_protease_easter-like_[Bombus_terrestris]`
 EASTER_like_gyne<- EASTER_like[1:4]
 EASTER_like_predia<- EASTER_like[5:8]
@@ -1210,7 +1175,7 @@ EASTER_like_plot <- ggplot(EASTER_like_df_melt, aes(x=Life_stage, y=Log2_values,
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("EASTER_like") +
+                ggtitle("Easter_like") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -1221,9 +1186,10 @@ EASTER_like_plot <- EASTER_like_plot +
                 axis.text.x = element_blank())
 ```
 
+XP_020721343.1 - antichymotrypsin-2
 
 ```{r}
-## 
+## antichymotrypsin-2:
 ACI2 <- haem_data_df$`XP_020721343.1_antichymotrypsin-2_[Bombus_terrestris]`
 ACI2_gyne<- ACI2[1:4]
 ACI2_predia<- ACI2[5:8]
@@ -1253,7 +1219,7 @@ ACI2_plot <- ggplot(ACI2_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_sta
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("ACI2") +
+                ggtitle("Antichymotrypsin_2") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -1264,10 +1230,10 @@ ACI2_plot <- ACI2_plot +
                 axis.text.x = element_blank())
 ```
 
-3. XP_012170795.1 - PGRPS2
+XP_020722610.1 - Fibrillin
 
 ```{r}
-## 
+## Fibrillin:
 FIB <- haem_data_df$`XP_020722610.1_fibrillin-2_[Bombus_terrestris]`
 FIB_gyne<- FIB[1:4]
 FIB_predia<- FIB[5:8]
@@ -1297,7 +1263,7 @@ FIB_plot <- ggplot(FIB_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage
                 xlab("Life stage") +
                 ylab("Log2 values") +
                 theme(legend.position="none") +
-                ggtitle("FIB") +
+                ggtitle("Fibrillin") +
                 scale_fill_brewer(type="qual", palette="RdBu") +
                 theme_bw() +
                 theme(legend.position="top")
@@ -1309,41 +1275,42 @@ FIB_plot <- FIB_plot +
                 axis.text.x = element_blank())
 ```
 
-4. Generate combined plots:
+Generate combined plots:
 
 ```{r}
 ## 
-ggarrange(SPTZ_plot, 
-          SPTZ_like_plot, 
-          EASTER_like_plot,
-          EASTER_plot,
+ggarrange( 
           PGRP2_plot, 
           PGRPSC2_plot,
-          SOT14_plot,
           LYSO_plot,
+          BGBP_plot,
+          APD_plot,
           MD2_plot, 
           LRRP_plot, 
-          Serpin_B3_plot,
-          four_domain_inhib_plot,
-          CI_like_plot,
-          ACI2_plot,
+          SOT14_plot,
+          EASTER_plot,
+          EASTER_like_plot,
+          SPTZ_like_plot, 
+          SPTZ_plot,
+          LYSO_plot,
           hymenoptaecin_plot,
           defensin_plot,
           abaecin_plot,
           apidaecin_plot,
-          SOD_df_plot,
-          TDX_plot,
-          GPX_plot,
-          FIB_plot,
+          Serpin_B3_plot,
+          CI_like_plot,
           chym_inhib_plot,
-          BGBP_plot,
-          APD_plot,
           ASPN_plot,
+          four_domain_inhib_plot,
+          ACI2_plot,
+          #SOD_df_plot,
+          #TDX_plot,
+          #GPX_plot,
           ncol = 5, 
-          nrow = 6, 
+          nrow = 5, 
           common.legend = TRUE)
 
-ggsave(file = "results/test.png",
+ggsave(file = "results/immune_de_proteins.jpeg",
        width = 20,
        height = 20)
 ```
