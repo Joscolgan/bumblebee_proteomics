@@ -9,7 +9,7 @@ The purpose of this script is to take label-free quantitative (LFQ) values as in
 1) Muscle-related genes
 2) Olfactory-related genes
 
-```{r}
+```{r, message = FALSE}
 ## Load libraries:
 libraries <- c("lintr", "ggplot2", "ggpubr", "reshape", "Rmisc")
 for (lib in libraries) {
@@ -28,145 +28,214 @@ Load in data:
 
 ```{r, echo=FALSE}
 ## Read in data and store as a variable:
-lfq_values <- read.csv(file = "~/Downloads/All Diapause Hits_for PCA_GOs.csv", header = TRUE)
+lfq_values <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.txt", header = TRUE)
 
 ## Subset:
-lfq_values_subset <- lfq_values[,1:25]
-rownames(lfq_values_subset) <- lfq_values_subset$Protein.ID
-lfq_values_subset$Protein.ID <- NULL
+rownames(lfq_values) <- lfq_values$T._Protein_ID
+lfq_values_subset <- lfq_values[,5:28]
 
 ## Need to be able to subset genes of interest:
-muscle_proteins <- read.table(file = "~/Documents/2017-03-25_diapause_proteomics/input_for_line_plots/muscle_proteins.txt", header = FALSE)
+muscle_proteins <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.cuticular_musclular.txt", header = FALSE)
 
 ## Update column names:
 colnames(muscle_proteins) <- c("protein_id", "protein_description")
 
 lfq_values_subset_muscle <- lfq_values_subset[which(row.names(lfq_values_subset) %in% muscle_proteins$protein_id), ]
 
+## Add protein description:
+lfq_values_subset_muscle$description <- muscle_proteins$protein_description
+
+## Update description name:
+rownames(lfq_values_subset_muscle) <- gsub("_", " ", lfq_values_subset_muscle$description)
+lfq_values_subset_muscle$description <- NULL
+
 ## Subset protein names:
-colnames(lfq_values_subset_muscle) <- c(rep("gyne", 4), rep("prediapause", 4), rep("early_diapause", 4),
-           rep("late diapause", 4), rep("6_hrs_postdiapause", 4), rep("48_hours_postdiapause", 4))
+colnames(lfq_values_subset_muscle) <- c(rep("Virgin queen (Gyne)", 4), 
+                                        rep("Prediapause", 4), 
+                                        rep("Early diapause", 4),
+                                        rep("Late diapause", 4), 
+                                        rep("6 hrs postdiapause", 4), 
+                                        rep("48 hours postdiapause", 4))
 
 ## Reshape:
 lfq_values_subset_muscle_melt <- melt(t(lfq_values_subset_muscle))
 
 ## Update column names:
-colnames(lfq_values_subset_muscle_melt) <- c("stage", "protein_id", "LFQ")
+colnames(lfq_values_subset_muscle_melt) <- c("Stage", "Protein_id", "LFQ")
 
 ## Plot line plot:
-lfq_values_subset_muscle_melt <- droplevels(lfq_values_subset_muscle_melt)
+#lfq_values_subset_muscle_melt <- droplevels(lfq_values_subset_muscle_melt)
 
-lfq_values_subset_muscle_melt$stage <- factor(lfq_values_subset_muscle_melt$stage, levels = c("gyne", "prediapause", "early_diapause", "late diapause", "6_hrs_postdiapause", "48_hours_postdiapause"))
+lfq_values_subset_muscle_melt$Stage <- factor(lfq_values_subset_muscle_melt$Stage, 
+                                              levels = c("Virgin queen (Gyne)", 
+                                                         "Prediapause", 
+                                                         "Early diapause", 
+                                                         "Late diapause", 
+                                                         "6 hrs postdiapause", 
+                                                         "48 hours postdiapause"))
+
+## Convert LFQ values from factor to numeric:
+#lfq_values_subset_muscle_melt$LFQ <- as.numeric(unlist(lfq_values_subset_muscle_melt$LFQ))
 
 ## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
 lfq_values_subset_muscle_melt_melt_SE <- summarySE(lfq_values_subset_muscle_melt, 
                                                  measurevar="LFQ", 
-                                                 groupvars=c("stage", "protein_id"))
+                                                 groupvars=c("Stage", "Protein_id"))
+## Print
+lfq_values_subset_muscle_melt_melt_SE
 
 ```
 
 Generate line graphs:
 
 ```{r}
-pd <- position_dodge(0.1) # move them .05 to the left and right
+## Add a value to slightly adjust the plotting of values:
+pd <- position_dodge(0.05) # move them .05 to the left and right
 
 ## Define title:
 plot_title_muscle <- "Muscle/structural-associated haemolymph proteins"
 
 ## Generate plot:
-muscle_plot <- ggplot(lfq_values_subset_muscle_melt_melt_SE, aes(x=stage, y=LFQ, colour=protein_id, group=protein_id)) + 
-    geom_errorbar(aes(ymin=LFQ-se, ymax=LFQ+se), colour="black", width=.1, position=pd) +
-    geom_line(position=pd) +
-    geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-    #xlab("Queen life cycle stages") +
-    ylab("LFQ values") +
-    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
-    #                 breaks=c("OJ", "VC"),
-    #                 labels=c("Orange juice", "Ascorbic acid"),
-    #                 l=40) +                    # Use darker colors, lightness=40
-    ggtitle(plot_title_muscle) +
-    #expand_limits(y=0) +                        # Expand y range
-    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
-    theme_bw() +
-        theme(legend.position = "bottom",
-              axis.title.x = element_blank(),
-              axis.text.x = element_text(angle = 45, hjust = 1),
-              #axis.text.y = element_text(face="bold"),
-              axis.title.y = element_text(face = "bold", size = 10))
+muscle_plot <- ggplot(lfq_values_subset_muscle_melt_melt_SE, 
+                      aes(x=Stage, 
+                          y=LFQ, 
+                          colour=Protein_id, 
+                          group=Protein_id)) + 
+                    geom_errorbar(aes(ymin=LFQ-se, 
+                                      ymax=LFQ+se), 
+                                      colour="black", 
+                                      width=.1, 
+                                      position=pd) +
+                    geom_line(position=pd, size=1.5) +
+                    geom_point(position=pd, size=3, shape=21) + # 21 is filled circle
+                    #xlab("Queen life cycle stages") +
+                    ylab("LFQ values") +
+                    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
+                    #                 breaks=c("OJ", "VC"),
+                    #                 labels=c("Orange juice", "Ascorbic acid"),
+                    #                 l=40) +                    # Use darker colors, lightness=40
+                    #ggtitle(plot_title_muscle) +
+                    #expand_limits(y=0) +                        # Expand y range
+                    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
+                    theme_bw() +
+                        theme(legend.position = "top",
+                              legend.text = element_text(size = 13),
+                              legend.title = element_text(size = 15),
+                              axis.title.x = element_blank(),
+                              axis.text.x = element_text(angle = 45, hjust = 1, size=20, face="bold"),
+                              #axis.text.y = element_text(face="bold"),
+                              axis.title.y = element_text(face = "bold", size = 20),
+                              axis.text.y = element_text(size = 20))
     #theme(legend.justification=c(1,0),
           #legend.position=c(1,0))               # Position legend in bottom right
 
+## Save output:
+ggsave("results/muscle_line_plot.png", 
+       height = 10, 
+       width = 20)
 
 ```
 
+Generate a line graph for olfactory-related proteins:
+
 ```{r}
 ## Read in file:
-olfaction_proteins <- read.table(file = "~/Documents/2017-03-25_diapause_proteomics/input_for_line_plots/olfaction_proteins.txt", header = FALSE)
+olfaction_proteins <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.olfaction_proteins.txt", header = FALSE)
 
 ## Update column names:
 colnames(olfaction_proteins) <- c("protein_id", "protein_description")
 
 lfq_values_subset_olfaction <- lfq_values_subset[which(row.names(lfq_values_subset) %in% olfaction_proteins$protein_id), ]
 
+## Add protein description:
+lfq_values_subset_olfaction$description <- paste(rownames(lfq_values_subset_olfaction), 
+                                              olfaction_proteins$protein_description, sep =" ")
+
+## Update description name:
+rownames(lfq_values_subset_olfaction) <- gsub("_", " ", lfq_values_subset_olfaction$description)
+lfq_values_subset_olfaction$description <- NULL
+
 ## Subset protein names:
-colnames(lfq_values_subset_olfaction) <- c(rep("gyne", 4), rep("prediapause", 4), rep("early diapause", 4),
-           rep("late diapause", 4), rep("6 hrs postdiapause", 4), rep("48 hours postdiapause", 4))
+colnames(lfq_values_subset_olfaction) <- c(rep("Virgin queen (Gyne)", 4), 
+                                        rep("Prediapause", 4), 
+                                        rep("Early diapause", 4),
+                                        rep("Late diapause", 4), 
+                                        rep("6 hrs postdiapause", 4), 
+                                        rep("48 hours postdiapause", 4))
 
 ## Reshape:
 lfq_values_subset_olfaction_melt <- melt(t(lfq_values_subset_olfaction))
 
 ## Update column names:
-colnames(lfq_values_subset_olfaction_melt) <- c("stage", "protein_id", "LFQ")
+colnames(lfq_values_subset_olfaction_melt) <- c("Stage", "Protein_id", "LFQ")
 
 ## Plot line plot:
-lfq_values_subset_olfaction_melt <- droplevels(lfq_values_subset_olfaction_melt)
+#lfq_values_subset_olfaction_melt <- droplevels(lfq_values_subset_olfaction_melt)
 
-lfq_values_subset_olfaction_melt$stage <- factor(lfq_values_subset_olfaction_melt$stage, levels = c("gyne", "prediapause", "early diapause", "late diapause", "6 hrs postdiapause", "48 hours postdiapause"))
+lfq_values_subset_olfaction_melt$Stage <- factor(lfq_values_subset_olfaction_melt$Stage, 
+                                              levels = c("Virgin queen (Gyne)", 
+                                                         "Prediapause", 
+                                                         "Early diapause", 
+                                                         "Late diapause", 
+                                                         "6 hrs postdiapause", 
+                                                         "48 hours postdiapause"))
+
+## Convert LFQ values from factor to numeric:
+#lfq_values_subset_olfaction_melt$LFQ <- as.numeric(unlist(lfq_values_subset_olfaction_melt$LFQ))
 
 ## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
-lfq_values_subset_olfaction_melt_SE <- summarySE(lfq_values_subset_olfaction_melt, 
+lfq_values_subset_olfaction_melt_melt_SE <- summarySE(lfq_values_subset_olfaction_melt, 
                                                  measurevar="LFQ", 
-                                                 groupvars=c("stage", "protein_id"))
+                                                 groupvars=c("Stage", "Protein_id"))
 
-
-## Insert value to adjust points:
-pd <- position_dodge(0.1) # move them .05 to the left and right
-
-## Define title:
-plot_title_olfaction <- "Olfaction-associated haemolymph proteins"
-
-## Generate plot:
-olfaction_plot <- ggplot(lfq_values_subset_olfaction_melt_SE, aes(x=stage, y=LFQ, colour=protein_id, group=protein_id)) + 
-    geom_errorbar(aes(ymin=LFQ-se, ymax=LFQ+se), colour="black", width=.1, position=pd) +
-    geom_line(position=pd) +
-    geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-    #xlab("Queen life cycle stages") +
-    ylab("LFQ values") +
-    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
-    #                 breaks=c("OJ", "VC"),
-    #                 labels=c("Orange juice", "Ascorbic acid"),
-    #                 l=40) +                    # Use darker colors, lightness=40
-    ggtitle(plot_title_olfaction) +
-    #expand_limits(y=0) +                        # Expand y range
-    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
-    theme_bw() +
-        theme(legend.position = "bottom",
-              axis.title.x = element_blank(),
-              axis.text.x = element_text(angle = 45, hjust = 1),
-              #axis.text.y = element_text(face="bold"),
-              axis.title.y = element_text(face = "bold", size = 10))
-    #theme(legend.justification=c(1,0),
-          #legend.position=c(1,0))               # Position legend in bottom right
 ```
 
-Combine figures for plotting:
+Generate line graphs:
 
 ```{r}
-## Combine figures for plotting:
-ggarrange(olfaction_plot, muscle_plot,
-          nrow =2, ncol=1)
+## Add a value to slightly adjust the plotting of values:
+pd <- position_dodge(0.05) # move them .05 to the left and right
 
-## output and save combined figure:
-ggsave("combined_figure.png", height = 20, width = 18)
+## Define title:
+plot_title_olfaction <- "olfaction/structural-associated haemolymph proteins"
+
+## Generate plot:
+olfaction_plot <- ggplot(lfq_values_subset_olfaction_melt_melt_SE, 
+                      aes(x=Stage, 
+                          y=LFQ, 
+                          colour=Protein_id, 
+                          group=Protein_id)) + 
+                    geom_errorbar(aes(ymin=LFQ-se, 
+                                      ymax=LFQ+se), 
+                                      colour="black", 
+                                      width=.1, 
+                                      position=pd) +
+                    geom_line(position=pd, size=1.5) +
+                    geom_point(position=pd, size=3, shape=21) + # 21 is filled circle
+                    #xlab("Queen life cycle stages") +
+                    ylab("LFQ values") +
+                    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
+                    #                 breaks=c("OJ", "VC"),
+                    #                 labels=c("Orange juice", "Ascorbic acid"),
+                    #                 l=40) +                    # Use darker colors, lightness=40
+                    #ggtitle(plot_title_muscle) +
+                    #expand_limits(y=0) +                        # Expand y range
+                    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
+                    theme_bw() +
+                        theme(legend.position = "right",
+                              legend.text = element_text(size = 13),
+                              legend.title = element_text(size = 15),
+                              axis.title.x = element_blank(),
+                              axis.text.x = element_text(angle = 45, hjust = 1, size=20, face="bold"),
+                              #axis.text.y = element_text(face="bold"),
+                              axis.title.y = element_text(face = "bold", size = 20),
+                              axis.text.y = element_text(size = 20))
+    #theme(legend.justification=c(1,0),
+          #legend.position=c(1,0))               # Position legend in bottom right
+
+## Save output:
+ggsave("results/olfaction_line_plot.png", 
+       height = 10, 
+       width = 22)
 
 ```
