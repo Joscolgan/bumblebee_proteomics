@@ -18,7 +18,7 @@ The first step is the loading of required R packages. If the package does not lo
 
 ```{r, message=FALSE}
 # Load libraries; install from scratch if needed
-libraries <- c("ggpubr", "RColorBrewer","hash", "ggplot2", "reshape")
+libraries <- c("ggpubr", "RColorBrewer","hash", "ggplot2", "reshape", "dplyr")
 for (lib in libraries) {
     if (require(package = lib, character.only = TRUE)) {
         print("Successful")
@@ -66,4 +66,59 @@ t.test(feeding_rate_clothianidin$value, feeding_rate_control$value)
 t.test(feeding_rate_clothianidin_imid$value, feeding_rate_control$value)
 ```
 
+## Read in data:
 
+```{r, message = FALSE}
+## Read in feeding information:
+feeding_data <- read.table( file = "./feeding_data.txt", header = TRUE)
+
+head(feeding_data[order(feeding_data$sum_sucrose_consumed_ml), ], n=10)
+
+feeding_data_subset <- feeding_data[,3:4]
+feeding_data_subset_melt <- melt(feeding_data_subset)
+
+## Melt for plotting with ggplot2:
+feeding_plot <- ggplot(feeding_data_subset_melt, aes(x = treatment, y = value)) +
+                        geom_boxplot() +
+                        ylab("Sum of sucrose consumed") +
+                        xlab("Treatment") +
+                        theme_bw()
+
+## Generate plot:
+feeding_plot +  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+## It would appear that the clothainidin treatments have reduced feeding in comparison to other treatments:
+feeding_rate_clothianidin <- subset(feeding_data_subset_melt, treatment == "Clothianidin")
+feeding_rate_clothianidin_imid <- subset(feeding_data_subset_melt, treatment == "Clothianidin_+_Imidacloprid")
+
+feeding_rate_control <- subset(feeding_data_subset_melt, treatment == "Control")
+
+## Comparison between sum of sucrose consumed:
+t.test(feeding_rate_clothianidin$value, feeding_rate_control$value)
+t.test(feeding_rate_clothianidin_imid$value, feeding_rate_control$value)
+```
+
+Read in data on the number of differentially expressed genes:
+ 
+```{r, message = FALSE}
+## Read in summary of DE genes:
+de_genes <- read.table(file = "./summary_de_genes.txt", header = TRUE)
+ 
+## Transpose matrix and convert into dataframe:
+de_genes_transposed <- as.data.frame(t(de_genes))
+ 
+## For each treatment group, calculate the mean sum of sucrose consumed per treatment:
+means_for_each_treatment<- group_by(feeding_data_subset, treatment) %>% summarize(m = mean(sum_sucrose_consumed_ml))
+means_for_each_treatment <- subset(means_for_each_treatment, treatment !="Control")
+
+## Add mean values:
+de_genes_transposed$mean_sucrose <- as.numeric(unlist(means_for_each_treatment$m))
+
+## Plot number of DE identified genes per treatment and the mean sucrose levels:
+ggplot(de_genes_transposed, aes(x = Sleuth_LRT, y = mean_sucrose)) +
+        geom_point()
+
+ggplot(de_genes_transposed, aes(x = Limma_VWTS, y = mean_sucrose)) +
+        geom_point()
+
+```
