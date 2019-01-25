@@ -1,8 +1,7 @@
 ---
-title: "haemolymph_heatmaps"
-author: "JoeColgan"
-date: "23 September 2018"
-output: html_document
+title: "Bombus haemolymph diapause study"
+output: gene_level_differential_expression_diapause.html
+authors: Joe Colgan (joscolgan)
 ---
 
 The purpose of this script is to take normalised z-score transformations of label free quantification (LFQ) values as input and generate a heatmap for differentially abundant proteins across the queen life-cycle stages:
