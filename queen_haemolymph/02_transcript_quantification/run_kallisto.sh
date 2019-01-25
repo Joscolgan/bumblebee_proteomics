@@ -63,3 +63,15 @@ do
 output_name="$(echo "$name" | cut -d '.' -f 1 - )"
 ../../bin/kallisto quant -i bter_1.0 -o "$output_name" --single -l 200 -s 20 "$name"
 done
+
+## Unlink symbolic links:
+for name in *.gz
+do
+unlink "$name"
+done
+
+## Return to directory containing raw data and compress:
+cd ../../data/
+mkdir data_files
+mv *.gz data_files
+tar -zcvf data_files.tar.gz data_files
