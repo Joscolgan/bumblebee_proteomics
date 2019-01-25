@@ -1,0 +1,127 @@
+## Create directories:
+mkdir data
+mkdir code
+mkdir results
+mkdir src
+mkdir bin
+
+## Download software
+cd src
+wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-mac64.tar.gz
+tar -zxvf sratoolkit.current-mac64.tar.gz
+rm sratoolkit.current-mac64.tar.gz
+cd ../bin
+
+## Create symbolic link for executables:
+ln -s ../src/sratoolkit.2.9.2-mac64/bin/fastq-dump.2.9.2 .
+cd ../data
+
+## Download files:
+while read line
+do
+abbrev_name="${line:0:6}"
+wget ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/"$abbrev_name"/"$line"/"$line".sra
+done < samples_to_download
+
+## Split downloaded files
+for name in *.sra
+do
+../bin/fastq-dump.2.9.2 --split-3 "$name"
+new_name="$(echo "$name" | cut -d '.' -f 1 - )"
+gzip "$new_name".fastq
+rm -f "$name"
+done
+
+## Download kallisto for performing pseudoalignments:
+cd ../src
+wget https://github.com/pachterlab/kallisto/releases/download/v0.45.0/kallisto_mac-v0.45.0.tar.gz
+tar -zxvf kallisto_mac-v0.45.0.tar.gz
+cd ../bin
+
+## Create symbolic link for running kallisto:
+ln -s ../src/kallisto/kallisto .
+
+## Create reference for pseudo alignments:
+cd ../data/
+mkdir reference_files
+cd reference_files
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/214/255/GCF_000214255.1_Bter_1.0/GCF_000214255.1_Bter_1.0_rna.fna.gzgunzip GCF_000214255.1_Bter_1.0_rna.fna.gz
+
+## Create an index
+cd ../results/
+mdkir 2019-01-25_kallisto_alignments
+cd 2019-01-25_kallisto_alignments
+../../bin/kallisto index -i bter_1.0 ../../data/reference_files/GCF_000214255.1_Bter_1.0_rna.fna
+
+## Quantify samples:
+## Create symbolic links for each sample:
+ln -s ../../data/*.gz .
+
+## Run kallisto:
+for name in *.gz
+do
+output_name="$(echo "$name" | cut -d '.' -f 1 - )"
+../../bin/kallisto quant -i bter_1.0 -o "$output_name" --single -l 200 -s 20 "$name"
+done
+
+## Unlink symbolic links:
+for name in *.gz
+do
+unlink "$name"
+done
+
+## Return to directory containing raw data and compress:
+cd ../../data/
+mkdir data_files
+mv *.gz data_files
+tar -zcvf data_files.tar.gz data_files
+rm -rf data_files
+
+## Create a directory for differential expression analysis:
+cd ../results
+mkdir 2019-01-25_differential_expression_analysis
+cd 2019-01-25_differential_expression_analysis
+mkdir input
+cd input
+
+## Create symbolic links with kallisto output:
+ln -s ../../2019-01-25_kallisto_alignments/SRR23966* .
+
+## Copy and open up markdown script
+cp -p ../../code/Bter_neonicotinoid_exposure_experiment/05_differential_expression_analysis/treatment_specific_analysis/gene_level_3_treatments.Rmd .
+open gene_level_3_treatments.Rmd
+
+## Generate a sample information text file containing:
+## 1) Name of sample folder containing kallisto output
+## 2) Treatment/status
+ls SRR23966* | grep ':' - | sed 's/://g' > sample_information.tmp
+sed 's/ /\t/g' sample_information.tmp > sample_information.txt
+
+## Download additional reference files:
+cd ../../data/reference_files
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/214/255/GCF_000214255.1_Bter_1.0/GCF_000214255.1_Bter_1.0_rna_from_genomic.fna.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/214/255/GCF_000214255.1_Bter_1.0/GCF_000214255.1_Bter_1.0_genomic.gff.gz
+gunzip *.gz
+
+## Generate a new one:
+grep '>' GCF_000214255.1_Bter_1.0_rna_from_genomic.fna | cut -d ' ' -f 1,2 - | sed 's/>//g' | sed 's/gene=//g' | sed 's/\[//g' | sed 's/\]//g' | tr ' ' '\' > rna_and_corresponding_genes.txt
+cd ../../results/2019-01-25_differential_expression_analysis/
+
+## Link:
+ln -s ../../data/reference_files/rna_and_corresponding_genes.txt .
+cat rna_and_corresponding_genes.txt | tr '\' '\t' > rna_and_corresponding_genes.tmp
+cut -d '_' -f6 rna_and_corresponding_genes.tmp | cut -f 2 > gene_ids.tmp
+cut -d '_' -f 4 rna_and_corresponding_genes.tmp  > rna_ids.tmp
+paste rna_ids.tmp gene_ids.tmp | tr ' ' '\t' > rna_and_corresponding_genes.txt
+
+## After running script, wish to examine expression of haemolymph proteins:
+mkdir differentially_expressed_proteins
+cd differentially_expressed_proteins
+grep 'LOC' haemolymph_genes.txt| sort | uniq -c | awk '$1==1' | awk '{ print $2 }' > haemolymph_genes.tmp
+
+## Link differentially expressed genes
+ln -s ../results/de_genes_post_vs_diapause.sig.txt .
+ln -s ../results/de_genes_pre_vs_diapause.sig.txt .
+
+grep -f haemolymph_genes.tmp de_genes_post_vs_diapause.sig.txt | wc -l
+grep -f haemolymph_genes.tmp de_genes_pre_vs_diapause.sig.txt | wc -l
