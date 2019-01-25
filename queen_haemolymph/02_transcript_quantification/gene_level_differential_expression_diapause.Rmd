@@ -1,8 +1,11 @@
 --- 
-title: "Bombus pesticide exposure: gene expression in head"
-output: gene_level_3treatments.html
-authors:  Isabel Fletcher, Joe Colgan, Yannick Wurm http://wurmlab.com
+title: "Bombus haemolymph diapause study"
+output: gene_level_differential_expression_diapause.html
+authors:  Joe Colgan (joscolgan)
 --- 
+Scripts adapted from Colgan et al. (2019).  
+Original script repository is here:
+https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment
 
 # Introduction
 This script is for differential gene expression analysis of transcript quantification data.
