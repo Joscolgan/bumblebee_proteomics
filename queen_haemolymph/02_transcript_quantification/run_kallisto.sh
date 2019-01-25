@@ -75,3 +75,4 @@ cd ../../data/
 mkdir data_files
 mv *.gz data_files
 tar -zcvf data_files.tar.gz data_files
+rm -rf data_files
