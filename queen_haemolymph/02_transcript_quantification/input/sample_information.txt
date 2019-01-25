@@ -1,0 +1,15 @@
+SRR2396633  Mated_prediapause Illumina_Genome_Analyzer
+SRR2396634  Mated_prediapause Illumina_Genome_Analyzer
+SRR2396640  Mated_prediapause Illumina_Genome_Analyzer
+SRR2396641  Mated_prediapause Illumina_Genome_Analyzer
+SRR2396644  Mated_prediapause Illumina_Genome_Analyzer
+SRR2396648  Diapause  Illumina_Genome_Analyzer
+SRR2396649  Diapause  Illumina_Genome_Analyzer
+SRR2396650  Diapause  Illumina_Genome_Analyzer
+SRR2396651  Diapause  Illumina_Genome_Analyzer
+SRR2396652  Diapause  Illumina_Genome_Analyzer
+SRR2396653  Founder_postdiapause  Illumina_Genome_Analyzer
+SRR2396654  Founder_postdiapause  Illumina_Genome_Analyzer
+SRR2396655  Founder_postdiapause  Illumina_Genome_Analyzer_II
+SRR2396656  Founder_postdiapause  Illumina_Genome_Analyzer_II
+SRR2396657  Founder_postdiapause  Illumina_Genome_Analyzer
