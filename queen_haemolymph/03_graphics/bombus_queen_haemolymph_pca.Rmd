@@ -1,6 +1,7 @@
 --- 
-title: "Bombus queen haemolymph proteome"
-output: bombus_queen_haemolymph_pca.html
+title: "Bombus haemolymph diapause study"
+output: gene_level_differential_expression_diapause.html
+authors: Joe Colgan (joscolgan)
 --- 
 
 Introduction:
