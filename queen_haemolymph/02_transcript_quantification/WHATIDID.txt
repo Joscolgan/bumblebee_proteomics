@@ -125,3 +125,9 @@ ln -s ../results/de_genes_pre_vs_diapause.sig.txt .
 
 grep -f haemolymph_genes.tmp de_genes_post_vs_diapause.sig.txt | wc -l
 grep -f haemolymph_genes.tmp de_genes_pre_vs_diapause.sig.txt | wc -l
+
+## For performing quality assessment of data from Amsalemn et al. (2015):
+cd ../../src/
+ln -s ../../../MultiQC/scripts/multiqc .
+cd ../data
+../src/multiqc .
