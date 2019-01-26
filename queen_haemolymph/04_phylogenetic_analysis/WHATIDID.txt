@@ -1,0 +1,22 @@
+## BLASTP alignment was performed for XP_003393186.2 against the NCBI nr database.
+## A number of alignment sequences were downloaded from the resulting batch including
+## homologous protein sequences for both bumblebees, other bees, wasps and ants.
+## The header information was editted manually to include:
+## 1) Abbreviated species name
+## 2) Protein ID
+## 3) Gene symbol from NCBI
+
+mkdir data
+cd data
+
+## Renamed file editted in Atom was saved here.
+## Alignment, filtering of alignment and generation of tree was performed using phylogeny.fr
+## http://www.phylogeny.fr/
+## Alignment was performed using muscle with 'full mode' parameter.
+## Curation of alignment was performed using Gblocks with more stringent selection parameter:
+## Do not allow many contiguous nonconserved positions - ticked.
+## Phylogenetic analysis was performed using PhyML using:
+## A bootstrap procedure: Number of bootstraps = 100
+## Substitution model = Jones-Taylor-Thornton matrix (protein)
+## Tree rendering was performing using TreeDyn.
+## This generates a tree editting interface. 
