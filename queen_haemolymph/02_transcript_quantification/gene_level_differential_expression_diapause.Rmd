@@ -20,7 +20,7 @@ This script uses the Wald test in DESeq2 to test for differential expression bet
 This can then be used for further analysis. 
 
 
-```{r}
+```{r, message = FALSE}
 # Load libraries; install from scratch if needed
 libraries <- c("tximport", "readr", "DESeq2",
                "ggplot2", "gplots", "rhdf5",
@@ -70,10 +70,9 @@ for (filenumber in 1:length(paths$kallisto_files)) {
 }
 ```
 
-
 ## Step Two: Put sample names and treatments into a samples dataframe for DESeqDataSetFromTximport
 
-```{r}
+```{r, message = FALSE}
 ## Extract sample names and put into df for tximport
 samples     <- data.frame(treatment = names(paths$kallisto_files))
 
@@ -96,6 +95,7 @@ if (FALSE == all(samples$treatment %in% rownames(samples_information))) {
 }
 samples_information
 ```
+
 ## Step Three: Import kallisto quantification files using Tximport
 
 We used kallisto to obtain estimated counts for each transcript in each condition. 
@@ -118,6 +118,16 @@ txi_counts <- tximport(paths$kallisto_files,
 dir.create(path = "results/count_estimates/",
            recursive = TRUE)
 save(txi_counts, file = "results/count_estimates/txi_count_estimates.Rdata")
+
+## Convert counts to dataframe:
+txi_counts_df <- as.data.frame(txi_counts$counts)
+
+# Write gene-level estimated counts to file:
+write.table(txi_counts_df,
+            file = "./results/raw_gene_level_counts.txt",
+            row.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
 ```
 
 ### Step Four: Run DESeq2 for differential expression analysis:
@@ -144,7 +154,7 @@ deseq_txi <- DESeqDataSetFromTximport(txi     = txi_counts,
 ```{r}
 ## Which genes are differentially expressed within each treatment for
 ## each caste in comparison to control?
-## Perform a LRT test to identify genes differentially expressed across time-points:
+## Perform a LRT test to identify genes differentially expressed across timepoints:
 deseq_object_lrt  <- DESeq(deseq_txi,
                            test = "LRT",
                            reduced = ~platform,
@@ -274,7 +284,10 @@ ggsave(file = "pca_output_diapause_samples.png",
        width = 10)
 ```
 
-Subset differentially expressed proteins:
+Check style guide as a final step
 
-
-
+```{r, message = FALSE}
+## Run lintr:
+library(lintr)
+lintr::lint("./gene_level_differential_expression_diapause.Rmd")
+```
