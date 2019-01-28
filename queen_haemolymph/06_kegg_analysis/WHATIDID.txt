@@ -1,0 +1,19 @@
+## Create directories to contain input data and output results:
+mkdir data
+mkdir results
+
+## Create symbolic link with genes underlying haemolymph proteins:
+cd results
+ln -s ../../2019-01-24_proteomics_transcriptomics_diapause/results/2019-01-25_differential_expression_analysis/differentially_expressed_proteins/haemolymph_genes.tmp .
+cd ../data/
+
+## Copy downloaded file from ensembl biomart with KEGG information:
+cp -p ~/Downloads/mart_export\ \(1\).txt .
+mv mart_export\ \(1\).txt mart_export_kegg.txt
+
+## Return to results directory:
+cd ../results/
+ln -s ../data/mart_export_kegg.txt .
+
+## Parse and subset haemolymph genes of interest:
+grep -f haemolymph_genes.tmp mart_export_kegg.txt > haemolymph_genes_kegg.txt
