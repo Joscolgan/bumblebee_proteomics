@@ -1,0 +1,32 @@
+## Generate a file to contain genes of interest:
+touch all_haemolymph_associated_genes.txt
+## Parse actual genes, sort and only retain unique sequences:
+grep 'LOC' all_haemolymph_associated_genes.txt | sort | uniq > all_haemolymph_associated_genes.tmp
+## Rename:
+mv all_haemolymph_associated_genes.tmp all_haemolymph_associated_genes.txt
+
+## Copy over the master file of gene ontology terms:
+cp -p ../code/Bter_neonicotinoid_exposure_experiment/07_gene_ontology_enrichment_analysis/input/dmel_vs_bter_biomart.input_for_converter.output.txt .
+
+## Copy over the script for running GO term enrichment:
+cp -p ../code/Bter_neonicotinoid_exposure_experiment/07_gene_ontology_enrichment_analysis/go_enrichment_analysis.Rmd .
+
+## Create directory to contain all files related to all haemolymph proteins:
+mkdir all_haemolymph_analysis
+mv go_enrichment_analysis.Rmd all_haemolymph_analysis
+mv all_haemolymph_associated_genes.txt all_haemolymph_analysis
+mv results all_haemolymph_analysis
+
+## Create a file for containing only proteins that change in abundance during the life-cycle stages:
+touch sig_haemolymph_associated_genes.txt
+
+## Subset by gene ID:
+grep 'LOC' sig_haemolymph_associated_genes.txt | awk '{ print $1 }' | grep -v ':' > sig_haemolymph_associated_genes.tmp 
+mv sig_haemolymph_associated_genes.tmp sig_haemolymph_associated_genes.txt
+
+## Create:
+mkdir sig_haemolymph_analysis
+mv sig_haemolymph_associated_genes.t* sig_haemolymph_analysis
+cd sig_haemolymph_analysis
+mv sig_haemolymph_associated_genes.tmp sig_haemolymph_associated_genes.txt
+cp -p ../all_haemolymph_analysis/go_enrichment_analysis.Rmd .
