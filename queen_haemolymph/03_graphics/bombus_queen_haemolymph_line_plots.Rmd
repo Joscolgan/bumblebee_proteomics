@@ -35,11 +35,11 @@ rownames(lfq_values) <- lfq_values$T._Protein_ID
 lfq_values_subset <- lfq_values[, 3:26]
 
 ## Need to be able to subset genes of interest:
-amp_proteins <- read.table(file = "data/amp_list.txt",
+proteins_of_interest <- read.table(file = "data/muscle_proteins.txt",
                               header = FALSE)
 
 ## Update column names:
-colnames(amp_proteins) <- c("description", "protein_id")
+colnames(proteins_of_interest) <- c("description", "protein_id")
 
 ## Calculate z_scores:
 class(lfq_values_subset)
@@ -63,14 +63,20 @@ test_mean$mean <- NULL
 
 ## Subset proteins of interest:
 tmp <- subset(test_mean, row.names(test_mean)
-              %in% amp_proteins$protein_id)
+              %in% proteins_of_interest$protein_id)
 
 ## Add protein description:
-tmp$description <- amp_proteins$description
+tmp$description <- proteins_of_interest$description
 
 ## Update description name:
 rownames(tmp) <- gsub("_", " ", tmp$description)
 tmp$description <- NULL
+
+## Extract human_friendly names for plotting:
+tmp_list <- strsplit(row.names(tmp), " ")
+for (item in 1:length(tmp_list)){
+        print(tmp_list[[item]][3])
+}
 
 ## Subset protein names:
 colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
@@ -114,6 +120,9 @@ pd <- position_dodge(0.05) # move them .05 to the left and right
 ## Define title:
 plot_title <- "Antimicrobial peptides"
 
+## Remove species information:
+tmp_melt_SE$Protein_id <- gsub("\\[Bombus terrestris]", "", tmp_melt_SE$Protein_id)
+
 ## Generate plot:
 line_plot <- ggplot(tmp_melt_SE,
                     aes(x = Stage,
@@ -146,119 +155,15 @@ line_plot <- ggplot(tmp_melt_SE,
 
 ## Change the colour pallete of the plot:
 line_plot <- line_plot +
-        scale_color_brewer(palette = "Reds")
+        scale_color_brewer(palette = "Greys")
 
 ## Define output:
-output <- "results/AMP_line_plot.png"
+output <- "results/muscle.png"
 
 ## Save output:
 ggsave(output,
        height = 10,
        width = 20)
-```
-
-Generate a line graph for olfactory-related proteins:
-
-```{r}
-## Read in file:
-olfaction_proteins <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.olfaction_proteins.txt", header = FALSE)
-
-## Update column names:
-colnames(olfaction_proteins) <- c("protein_id", "protein_description")
-
-lfq_values_subset_olfaction <- lfq_values_subset[which(row.names(lfq_values_subset) %in% olfaction_proteins$protein_id), ]
-
-## Add protein description:
-lfq_values_subset_olfaction$description <- paste(rownames(lfq_values_subset_olfaction), 
-                                              olfaction_proteins$protein_description, sep =" ")
-
-## Update description name:
-rownames(lfq_values_subset_olfaction) <- gsub("_", " ", lfq_values_subset_olfaction$description)
-lfq_values_subset_olfaction$description <- NULL
-
-## Subset protein names:
-colnames(lfq_values_subset_olfaction) <- c(rep("Virgin queen (Gyne)", 4), 
-                                        rep("Prediapause", 4), 
-                                        rep("Early diapause", 4),
-                                        rep("Late diapause", 4), 
-                                        rep("6 hrs postdiapause", 4), 
-                                        rep("48 hours postdiapause", 4))
-
-## Reshape:
-lfq_values_subset_olfaction_melt <- melt(t(lfq_values_subset_olfaction))
-
-## Update column names:
-colnames(lfq_values_subset_olfaction_melt) <- c("Stage", "Protein_id", "LFQ")
-
-## Plot line plot:
-#lfq_values_subset_olfaction_melt <- droplevels(lfq_values_subset_olfaction_melt)
-
-lfq_values_subset_olfaction_melt$Stage <- factor(lfq_values_subset_olfaction_melt$Stage, 
-                                              levels = c("Virgin queen (Gyne)", 
-                                                         "Prediapause", 
-                                                         "Early diapause", 
-                                                         "Late diapause", 
-                                                         "6 hrs postdiapause", 
-                                                         "48 hours postdiapause"))
-
-## Convert LFQ values from factor to numeric:
-#lfq_values_subset_olfaction_melt$LFQ <- as.numeric(unlist(lfq_values_subset_olfaction_melt$LFQ))
-
-## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
-lfq_values_subset_olfaction_melt_melt_SE <- summarySE(lfq_values_subset_olfaction_melt, 
-                                                 measurevar="LFQ", 
-                                                 groupvars=c("Stage", "Protein_id"))
-
-```
-
-Generate line graphs:
-
-```{r}
-## Add a value to slightly adjust the plotting of values:
-pd <- position_dodge(0.05) # move them .05 to the left and right
-
-## Define title:
-plot_title_olfaction <- "olfaction/structural-associated haemolymph proteins"
-
-## Generate plot:
-olfaction_plot <- ggplot(lfq_values_subset_olfaction_melt_melt_SE, 
-                      aes(x=Stage, 
-                          y=LFQ, 
-                          colour=Protein_id, 
-                          group=Protein_id)) + 
-                    geom_errorbar(aes(ymin=LFQ-se, 
-                                      ymax=LFQ+se), 
-                                      colour="black", 
-                                      width=.1, 
-                                      position=pd) +
-                    geom_line(position=pd, size=1.5) +
-                    geom_point(position=pd, size=3, shape=21) + # 21 is filled circle
-                    #xlab("Queen life cycle stages") +
-                    ylab("LFQ values") +
-                    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
-                    #                 breaks=c("OJ", "VC"),
-                    #                 labels=c("Orange juice", "Ascorbic acid"),
-                    #                 l=40) +                    # Use darker colors, lightness=40
-                    #ggtitle(plot_title_muscle) +
-                    #expand_limits(y=0) +                        # Expand y range
-                    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
-                    theme_bw() +
-                        theme(legend.position = "right",
-                              legend.text = element_text(size = 13),
-                              legend.title = element_text(size = 15),
-                              axis.title.x = element_blank(),
-                              axis.text.x = element_text(angle = 45, hjust = 1, size=20, face="bold"),
-                              #axis.text.y = element_text(face="bold"),
-                              axis.title.y = element_text(face = "bold", size = 20),
-                              axis.text.y = element_text(size = 20))
-    #theme(legend.justification=c(1,0),
-          #legend.position=c(1,0))               # Position legend in bottom right
-
-## Save output:
-ggsave("results/olfaction_line_plot.png", 
-       height = 10, 
-       width = 22)
-
 ```
 
 Run lintr:
