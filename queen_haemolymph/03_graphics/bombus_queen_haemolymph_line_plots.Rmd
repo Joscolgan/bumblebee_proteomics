@@ -10,7 +10,7 @@ The purpose of this script is to take label-free quantitative (LFQ) values as in
 
 ```{r, message = FALSE}
 ## Load libraries:
-libraries <- c("lintr", "ggplot2", "ggpubr", "reshape", "Rmisc")
+libraries <- c("lintr", "ggplot2", "ggpubr", "reshape", "Rmisc", "matrixStats")
 for (lib in libraries) {
         if (require(package = lib, character.only = TRUE)) {
                 print("Successful")
@@ -27,14 +27,12 @@ Load in data:
 
 ```{r, echo=FALSE}
 ## Read in data and store as a variable:
-lfq_values <- read.table(file = "input/input_for_plots.txt", header = TRUE)
+lfq_values <- read.table(file = "input/input_for_plots.txt",
+                         header = TRUE)
 
 ## Subset:
 rownames(lfq_values) <- lfq_values$T._Protein_ID
-lfq_values_subset <- lfq_values[,3:26]
-
-## Log transform the values:
-lfq_values_subset_log <- log10(lfq_values_subset)
+lfq_values_subset <- lfq_values[, 3:26]
 
 ## Need to be able to subset genes of interest:
 amp_proteins <- read.table(file = "data/amp_list.txt",
@@ -43,8 +41,28 @@ amp_proteins <- read.table(file = "data/amp_list.txt",
 ## Update column names:
 colnames(amp_proteins) <- c("description", "protein_id")
 
+## Calculate z_scores:
+class(lfq_values_subset)
+test_sd <- transform(as.matrix(lfq_values_subset),
+          SD = rowSds(as.matrix(lfq_values_subset),
+                    na.rm = TRUE))
+
+test_mean <- transform(as.matrix(test_sd),
+                       mean = rowMeans(as.matrix(test_sd[, 1:24]),
+                                 na.rm = TRUE))
+
+## For eac column, substract the row mean and divide by the standard deviation:
+for (row in 1:nrow(test_mean)){
+        print(row)
+        test_mean[row, ] <- (test_mean[row, ] - test_mean$mean[row]) / test_mean$SD[row]
+}
+
+## Remove mean and SD:
+test_mean$SD <- NULL
+test_mean$mean <- NULL
+
 ## Subset proteins of interest:
-tmp <- subset(lfq_values_subset_log, row.names(lfq_values_subset_log)
+tmp <- subset(test_mean, row.names(test_mean)
               %in% amp_proteins$protein_id)
 
 ## Add protein description:
@@ -77,13 +95,11 @@ tmp_melt$Stage <- factor(tmp_melt$Stage,
                                     "6 hrs postdiapause",
                                     "48 hours postdiapause"))
 
-## Convert LFQ values from factor to numeric:
-#lfq_values_subset_muscle_melt$LFQ <- as.numeric(unlist(lfq_values_subset_muscle_melt$LFQ))
-
 ## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
 tmp_melt_SE <- summarySE(tmp_melt,
-                         measurevar="LFQ",
-                         groupvars=c("Stage", "Protein_id"))
+                         measurevar = "LFQ",
+                         groupvars = c("Stage",
+                                       "Protein_id"))
 
 ## Print
 tmp_melt_SE
@@ -99,44 +115,46 @@ pd <- position_dodge(0.05) # move them .05 to the left and right
 plot_title <- "Antimicrobial peptides"
 
 ## Generate plot:
-line_plot <- ggplot(tmp_melt_SE, 
-                      aes(x=Stage, 
-                          y=LFQ, 
-                          colour=Protein_id, 
-                          group=Protein_id)) + 
-                    geom_errorbar(aes(ymin=LFQ-se, 
-                                      ymax=LFQ+se), 
-                                      colour="black", 
-                                      width=.1, 
-                                      position=pd) +
-                    geom_line(position=pd, size=1.5) +
-                    geom_point(position=pd, size=3, shape=21) + # 21 is filled circle
-                    #xlab("Queen life cycle stages") +
-                    ylab("LFQ values") +
-                    #scale_colour_hue(name="Supplement type",    # Legend label, use darker colors
-                    #                 breaks=c("OJ", "VC"),
-                    #                 labels=c("Orange juice", "Ascorbic acid"),
-                    #                 l=40) +                    # Use darker colors, lightness=40
-                    #ggtitle(plot_title_muscle) +
-                    #expand_limits(y=0) +                        # Expand y range
-                    scale_y_continuous(breaks=0:20*2) +         # Set tick every 4
-                    theme_bw() +
-                        theme(legend.position = "top",
-                              legend.text = element_text(size = 13),
-                              legend.title = element_text(size = 15),
-                              axis.title.x = element_blank(),
-                              axis.text.x = element_text(angle = 45, hjust = 1, size=20, face="bold"),
-                              #axis.text.y = element_text(face="bold"),
-                              axis.title.y = element_text(face = "bold", size = 20),
-                              axis.text.y = element_text(size = 20))
-    #theme(legend.justification=c(1,0),
-          #legend.position=c(1,0))               # Position legend in bottom right
+line_plot <- ggplot(tmp_melt_SE,
+                    aes(x = Stage,
+                        y = LFQ,
+                        colour = Protein_id,
+                        group = Protein_id)) +
+        geom_errorbar(aes(ymin = LFQ - se,
+                          ymax = LFQ + se),
+                      colour = "black",
+                      width = .1,
+                      position = pd) +
+        geom_line(position = pd,
+                  size = 1.5) +
+        geom_point(position = pd,
+                   size = 3,
+                   shape = 21) + # 21 is filled circle
+        ylab("Z-score normalised LFQ values") +
+        theme_bw() +
+        theme(legend.position = "top",
+              legend.text = element_text(size = 13),
+              legend.title = element_text(size = 15),
+              axis.title.x = element_blank(),
+              axis.text.x = element_text(angle = 45,
+                                         hjust = 1,
+                                         size = 20,
+                                         face = "bold"),
+              axis.title.y = element_text(face = "bold",
+                                          size = 20),
+              axis.text.y = element_text(size = 20))
+
+## Change the colour pallete of the plot:
+line_plot <- line_plot +
+        scale_color_brewer(palette = "Reds")
+
+## Define output:
+output <- "results/AMP_line_plot.png"
 
 ## Save output:
-ggsave("results/muscle_line_plot.png", 
-       height = 10, 
+ggsave(output,
+       height = 10,
        width = 20)
-
 ```
 
 Generate a line graph for olfactory-related proteins:
@@ -241,4 +259,12 @@ ggsave("results/olfaction_line_plot.png",
        height = 10, 
        width = 22)
 
+```
+
+Run lintr:
+
+```{r, message = FALSE}
+## Run lintr:
+library(lintr)
+lintr::lint(file = "./bombus_queen_haemolymph_line_plots.Rmd")
 ```
