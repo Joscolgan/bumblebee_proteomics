@@ -27,62 +27,66 @@ Load in data:
 
 ```{r, echo=FALSE}
 ## Read in data and store as a variable:
-lfq_values <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.txt", header = TRUE)
+lfq_values <- read.table(file = "input/input_for_plots.txt", header = TRUE)
 
 ## Subset:
 rownames(lfq_values) <- lfq_values$T._Protein_ID
-lfq_values_subset <- lfq_values[,5:28]
+lfq_values_subset <- lfq_values[,3:26]
+
+## Log transform the values:
+lfq_values_subset_log <- log10(lfq_values_subset)
 
 ## Need to be able to subset genes of interest:
-muscle_proteins <- read.table(file = "input/diapause_results_111118_de_proteins_input_for_boxplots.cuticular_musclular.txt", header = FALSE)
+amp_proteins <- read.table(file = "data/amp_list.txt",
+                              header = FALSE)
 
 ## Update column names:
-colnames(muscle_proteins) <- c("protein_id", "protein_description")
+colnames(amp_proteins) <- c("description", "protein_id")
 
-lfq_values_subset_muscle <- lfq_values_subset[which(row.names(lfq_values_subset) %in% muscle_proteins$protein_id), ]
+## Subset proteins of interest:
+tmp <- subset(lfq_values_subset_log, row.names(lfq_values_subset_log)
+              %in% amp_proteins$protein_id)
 
 ## Add protein description:
-lfq_values_subset_muscle$description <- muscle_proteins$protein_description
+tmp$description <- amp_proteins$description
 
 ## Update description name:
-rownames(lfq_values_subset_muscle) <- gsub("_", " ", lfq_values_subset_muscle$description)
-lfq_values_subset_muscle$description <- NULL
+rownames(tmp) <- gsub("_", " ", tmp$description)
+tmp$description <- NULL
 
 ## Subset protein names:
-colnames(lfq_values_subset_muscle) <- c(rep("Virgin queen (Gyne)", 4), 
-                                        rep("Prediapause", 4), 
-                                        rep("Early diapause", 4),
-                                        rep("Late diapause", 4), 
-                                        rep("6 hrs postdiapause", 4), 
-                                        rep("48 hours postdiapause", 4))
+colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
+                   rep("Prediapause", 4),
+                   rep("Early diapause", 4),
+                   rep("Late diapause", 4),
+                   rep("6 hrs postdiapause", 4),
+                   rep("48 hours postdiapause", 4))
 
 ## Reshape:
-lfq_values_subset_muscle_melt <- melt(t(lfq_values_subset_muscle))
+tmp_melt <- melt(t(tmp))
 
 ## Update column names:
-colnames(lfq_values_subset_muscle_melt) <- c("Stage", "Protein_id", "LFQ")
+colnames(tmp_melt) <- c("Stage", "Protein_id", "LFQ")
 
 ## Plot line plot:
-#lfq_values_subset_muscle_melt <- droplevels(lfq_values_subset_muscle_melt)
-
-lfq_values_subset_muscle_melt$Stage <- factor(lfq_values_subset_muscle_melt$Stage, 
-                                              levels = c("Virgin queen (Gyne)", 
-                                                         "Prediapause", 
-                                                         "Early diapause", 
-                                                         "Late diapause", 
-                                                         "6 hrs postdiapause", 
-                                                         "48 hours postdiapause"))
+tmp_melt$Stage <- factor(tmp_melt$Stage,
+                         levels = c("Virgin queen (Gyne)",
+                                    "Prediapause",
+                                    "Early diapause",
+                                    "Late diapause",
+                                    "6 hrs postdiapause",
+                                    "48 hours postdiapause"))
 
 ## Convert LFQ values from factor to numeric:
 #lfq_values_subset_muscle_melt$LFQ <- as.numeric(unlist(lfq_values_subset_muscle_melt$LFQ))
 
 ## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
-lfq_values_subset_muscle_melt_melt_SE <- summarySE(lfq_values_subset_muscle_melt, 
-                                                 measurevar="LFQ", 
-                                                 groupvars=c("Stage", "Protein_id"))
-## Print
-lfq_values_subset_muscle_melt_melt_SE
+tmp_melt_SE <- summarySE(tmp_melt,
+                         measurevar="LFQ",
+                         groupvars=c("Stage", "Protein_id"))
 
+## Print
+tmp_melt_SE
 ```
 
 Generate line graphs:
@@ -92,10 +96,10 @@ Generate line graphs:
 pd <- position_dodge(0.05) # move them .05 to the left and right
 
 ## Define title:
-plot_title_muscle <- "Muscle/structural-associated haemolymph proteins"
+plot_title <- "Antimicrobial peptides"
 
 ## Generate plot:
-muscle_plot <- ggplot(lfq_values_subset_muscle_melt_melt_SE, 
+line_plot <- ggplot(tmp_melt_SE, 
                       aes(x=Stage, 
                           y=LFQ, 
                           colour=Protein_id, 
