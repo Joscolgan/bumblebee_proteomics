@@ -1,0 +1,180 @@
+---
+title: "Bombus haemolymph diapause study"
+output: gene_level_differential_expression_diapause.html
+authors: Joe Colgan (joscolgan)
+---
+
+The purpose of this script is to take label-free quantitative (LFQ) values as input and generate line graphs for biological groups of interest, namely:
+1) Muscle-related genes
+2) Olfactory-related genes
+
+```{r, message = FALSE}
+## Load libraries:
+libraries <- c("lintr", "ggplot2", "ggpubr",
+               "reshape", "Rmisc", "matrixStats")
+for (lib in libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                source("https://bioconductor.org/biocLite.R")
+                biocLite(pkgs = lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+Load in data:
+
+```{r, echo=FALSE}
+## Read in data and store as a variable:
+lfq_values <- read.table(file = "input/input_for_plots.txt",
+                         header = TRUE)
+
+## Subset:
+rownames(lfq_values) <- lfq_values$T._Protein_ID
+lfq_values_subset <- lfq_values[, 3:26]
+
+## Need to be able to subset genes of interest:
+proteins_of_interest <- read.table(file = "data/olfaction_proteins.txt",
+                              header = FALSE)
+
+## Update column names:
+colnames(proteins_of_interest) <- c("description", "protein_id")
+
+## Calculate z_scores:
+class(lfq_values_subset)
+test_sd <- transform(as.matrix(lfq_values_subset),
+          SD = rowSds(as.matrix(lfq_values_subset),
+                    na.rm = TRUE))
+
+test_mean <- transform(as.matrix(test_sd),
+                       mean = rowMeans(as.matrix(test_sd[, 1:24]),
+                                 na.rm = TRUE))
+
+## For eac column, substract the row mean and divide by the standard deviation:
+for (row in 1:nrow(test_mean)){
+        print(row)
+        test_mean[row, ] <- (test_mean[row, ] - test_mean$mean[row]) / test_mean$SD[row]
+}
+
+## Remove mean and SD:
+test_mean$SD <- NULL
+test_mean$mean <- NULL
+
+## Subset proteins of interest:
+tmp <- subset(test_mean, row.names(test_mean)
+              %in% proteins_of_interest$protein_id)
+
+## Add protein description:
+tmp$description <- proteins_of_interest$description
+
+## Update description name:
+rownames(tmp) <- gsub("_", " ", tmp$description)
+tmp$description <- NULL
+
+## Update column names:
+colnames(proteins_of_interest) <- c("description", "protein_id")
+
+## Remove species ID:
+row.names(tmp) <- gsub("Bombus terrestris",
+                       "",
+                       row.names(tmp))
+row.names(tmp) <- gsub("\\[]",
+                       "",
+                       row.names(tmp))
+row.names(tmp) <- gsub("_",
+                       " ",
+                       row.names(tmp))
+
+## Subset protein names:
+colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
+                   rep("Prediapause", 4),
+                   rep("Early diapause", 4),
+                   rep("Late diapause", 4),
+                   rep("6 hrs postdiapause", 4),
+                   rep("48 hours postdiapause", 4))
+
+## Reshape:
+tmp_melt <- melt(t(tmp))
+
+## Update column names:
+colnames(tmp_melt) <- c("Stage", "Protein_id", "LFQ")
+
+## Plot line plot:
+tmp_melt$Stage <- factor(tmp_melt$Stage,
+                         levels = c("Virgin queen (Gyne)",
+                                    "Prediapause",
+                                    "Early diapause",
+                                    "Late diapause",
+                                    "6 hrs postdiapause",
+                                    "48 hours postdiapause"))
+
+## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
+tmp_melt_SE <- summarySE(tmp_melt,
+                         measurevar = "LFQ",
+                         groupvars = c("Stage",
+                                       "Protein_id"))
+
+## Print
+tmp_melt_SE
+```
+
+Generate line graphs:
+
+```{r}
+## Add a value to slightly adjust the plotting of values:
+pd <- position_dodge(0.05) # move them .05 to the left and right
+
+## Define title:
+plot_title <- "Olfaction-related proteins"
+
+## Generate plot:
+line_plot <- ggplot(tmp_melt_SE,
+                    aes(x = Stage,
+                        y = LFQ,
+                        colour = Protein_id,
+                        group = Protein_id)) +
+        geom_errorbar(aes(ymin = LFQ - se,
+                          ymax = LFQ + se),
+                      colour = "black",
+                      width = .1,
+                      position = pd) +
+        geom_line(position = pd,
+                  size = 1.5) +
+        geom_point(position = pd,
+                   size = 3,
+                   shape = 21) + # 21 is filled circle
+        ylab("Normalised z-scores") +
+        theme_bw() +
+        theme(legend.position = "top",
+              legend.text = element_text(size = 13),
+              legend.title = element_text(size = 15),
+              axis.title.x = element_blank(),
+              axis.text.x = element_text(angle = 45,
+                                         hjust = 1,
+                                         size = 12,
+                                         face = "bold"),
+              axis.title.y = element_text(face = "bold",
+                                          size = 12),
+              axis.text.y = element_text(size = 12))
+
+## Change the colour pallete of the plot:
+line_plot <- line_plot +
+        scale_color_brewer(palette = "Spectral")
+
+## Define output:
+output <- "results/olfaction_line_plot.png"
+
+## Save output:
+ggsave(output,
+       height = 7,
+       width = 15)
+```
+
+Run lintr:
+
+```{r, message = FALSE}
+## Run lintr:
+lintr::lint(file = "./bombus_queen_haemolymph_line_plots.Rmd")
+```
