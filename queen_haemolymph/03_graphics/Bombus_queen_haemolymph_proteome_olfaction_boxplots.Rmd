@@ -100,11 +100,20 @@ tmp <- subset(test_mean, row.names(test_mean)
 
 tmp$description <- row.names(tmp)
 
+## Subset protein names:
+colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
+                   rep("Prediapause", 4),
+                   rep("Early diapause", 4),
+                   rep("Late diapause", 4),
+                   rep("6 hrs postdiapause", 4),
+                   rep("48 hours postdiapause", 4),
+                   "description")
+
 ## Make sure it is a dataframe:
 tmp_df <- as.data.frame(tmp)
 
 ## Reshape for plotting:
-tmp_df_melt <- melt(tmp_df)
+tmp_df_melt <- t(tmp_df)
 
 ## Update column names:
 colnames(tmp_df_melt) <- c("Protein", "Life_Stage", "Normalised_LFQ")
@@ -115,21 +124,37 @@ bp <- ggplot(tmp_df_melt,
                  group = Life_Stage)) + 
         geom_boxplot(aes(fill = Life_Stage))
 
-bp + facet_grid(Protein ~ .)
+bp + facet_grid(. ~ Protein)
 
-abaecin_plot <- ggplot(abaecin_df_melt, aes(x=Life_stage, y=Log2_values, fill=Life_stage)) + 
-                geom_boxplot() +
+
+bp <- ggplot(tmp_df_melt,
+                       aes(x = Life_Stage,
+                           y = Normalised_LFQ,
+                           aes(fill = Life_Stage))) +
+                #geom_boxplot(aes(fill = Life_Stage)) +
+                     geom_boxplot() +
                 xlab("Life stage") +
-                ylab("Log2 values") +
-                ylim(c(24,35)) +
+                ylab("Normalised values") +
+                #ylim(c(24,35)) +
                 theme(legend.position="none") +
-                ggtitle("Abaecin") +
-                scale_fill_brewer(type="qual", palette="RdBu") +
+                ggtitle("Olfaction-related proteins") +
+                scale_fill_brewer(type = "qual",
+                                  palette = "RdBu") +
                 theme_bw() +
-                theme(legend.position="top")
+                theme(legend.position = "top")
 
-abaecin_plot <- abaecin_plot +
+bp <- bp +
                 theme(axis.text=element_text(size=15),
                 axis.title= element_text(size=15,face="bold"), 
                 axis.text.x = element_blank())
+
+bp + facet_grid(. ~ Protein, scales = "free", space = "free")
+
+## Define output:
+output <- "results/olfaction_box_plots.png"
+
+## Save output:
+ggsave(output,
+       height = 10,
+       width = 20)
 ```
