@@ -20,3 +20,8 @@ cd data
 ## Substitution model = Jones-Taylor-Thornton matrix (protein)
 ## Tree rendering was performing using TreeDyn.
 ## This generates a tree editting interface. 
+
+## For plotting, a file can be generated containing two columns:
+## Column 1: FASTA header
+## Column 2: Species name
+grep '>' hahp_family_renamed.fasta | sed 's/>//g' > species_list.txt
