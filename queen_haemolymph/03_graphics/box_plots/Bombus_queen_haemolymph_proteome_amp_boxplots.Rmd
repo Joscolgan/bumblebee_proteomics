@@ -1,0 +1,193 @@
+--- 
+title: "Bombus haemolymph diapause study"
+output: gene_level_differential_expression_diapause.html
+authors: Joe Colgan (joscolgan)
+--- 
+
+Introduction:
+=============
+
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, Perseus, z-score normalise and plot as boxplots using the R package, ggplot2. The output is a box plot.
+
+Load libraries:
+
+```{r}
+# Load libraries; install from scratch if needed
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer",
+               "ggpubr", "reshape", "matrixStats")
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        biocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+
+## Script will comlain if already exists:
+dir.create("results")
+```
+
+Read in input data:
+
+```{r, message = FALSE}
+## Read in data and store as a dataframe:
+haem_data <- read.table(file = "input/input_for_plots.txt",
+                        header = TRUE)
+
+## Assign the first column containing protein_id to the rowname:
+rownames(haem_data) <- haem_data$T._Protein_ID
+
+## Subset columns containing intensity values:
+haem_data_subset <- haem_data[, 3:26]
+head(haem_data_subset)
+
+## Transpose:
+haem_data_df <- as.data.frame(t(haem_data_subset))
+
+## Add a column indicating life cycle 'stage':
+rownames(haem_data_df)
+
+## Calculate z_scores:
+class(haem_data_subset)
+test_sd <- transform(as.matrix(haem_data_subset),
+          SD = rowSds(as.matrix(haem_data_subset),
+                    na.rm = TRUE))
+
+test_mean <- transform(as.matrix(test_sd),
+                       mean = rowMeans(as.matrix(test_sd[, 1:24]),
+                                 na.rm = TRUE))
+
+## For eac column, substract the row mean and divide by the standard deviation:
+for (row in 1:nrow(test_mean)){
+        print(row)
+        test_mean[row, ] <- (test_mean[row, ] - test_mean$mean[row]) / test_mean$SD[row]
+}
+
+## Remove mean and SD:
+test_mean$SD <- NULL
+test_mean$mean <- NULL
+```
+
+Subset proteins of interest and plot:
+
+```{r, message = FALSE}
+## Update column names:
+## The dataframe needs to be rearranged for boxplots:
+## Subset based on a list of proteins:
+proteins_of_interest <- read.table(file = "data/amp_list.txt",
+                              header = FALSE)
+
+## Update column names:
+colnames(proteins_of_interest) <- c("description", "protein_id")
+
+## Remove species ID:
+proteins_of_interest$description <- gsub("Bombus_terrestris",
+                                         "",
+                                         proteins_of_interest$description)
+proteins_of_interest$description <- gsub("\\[]",
+                                         "",
+                                         proteins_of_interest$description)
+proteins_of_interest$description <- gsub("_",
+                                         " ",
+                                         proteins_of_interest$description)
+
+## Subset proteins of interest:
+tmp <- subset(test_mean, row.names(test_mean)
+              %in% proteins_of_interest$protein_id)
+
+## Transpose:
+tmp_trans <- t(tmp)
+
+## For each proteins reformat:
+reformat_for_plot <- function(input,
+                              protein,
+                              description){
+        print(protein)
+        protein_tmp <- input[, protein]
+        gyne <- protein_tmp[1:4]
+        prediapause <- protein_tmp[5:8]
+        early_diapause <- protein_tmp[9:12]
+        late_diapause <- protein_tmp[13:16]
+        early_postdiapause <- protein_tmp[17:20]
+        late_postdiapause <- protein_tmp[21:24]
+        ## Recombine
+        protein_df <- cbind(gyne,
+                            prediapause,
+                            early_diapause,
+                            late_diapause,
+                            early_postdiapause,
+                            late_postdiapause)
+        ## Rename columns:
+        colnames(protein_df) <- c("gyne",
+                                  "prediapause",
+                                  "early_diapause",
+                                  "late_diapause",
+                                  "early_postdiapause",
+                                  "late_postdiapause")
+        ## Make sure it is a dataframe:
+        protein_df <- as.data.frame(protein_df)
+        ## Reshape for plotting:
+        protein_df_melt <- melt(protein_df)
+        ## Update column names:
+        colnames(protein_df_melt) <- c("Life_stage", "Log2_values")
+        ## Plot:
+        protein_plot <- ggplot(protein_df_melt, aes(x = Life_stage,
+                                                    y = Log2_values,
+                                                    fill = Life_stage)) +
+                geom_boxplot() +
+                xlab("Life stage") +
+                ylab("Normalised z-scores") +
+                #ylim(c(24,35)) +
+                theme(legend.position = "none") +
+                ggtitle(description) +
+                scale_fill_brewer(type = "qual",
+                                  palette = "RdBu") +
+                theme_bw() +
+                theme(legend.position = "top")
+        protein_plot <- protein_plot +
+                theme(axis.text = element_text(size = 10),
+                      axis.title = element_text(size = 10,
+                                                face = "bold"),
+                axis.text.x = element_blank(),
+                plot.title = element_text(size = 10))
+        ## Return plot:
+        print(protein_plot)
+}
+
+length(proteins_of_interest$protein_id)
+
+## Print all proteins of interest together:
+ggarrange(reformat_for_plot(tmp_trans,
+                            proteins_of_interest$protein_id[1],
+                            proteins_of_interest$description[1]),
+          reformat_for_plot(tmp_trans,
+                            proteins_of_interest$protein_id[2],
+                            proteins_of_interest$description[2]),
+          reformat_for_plot(tmp_trans,
+                            proteins_of_interest$protein_id[3],
+                            proteins_of_interest$description[3]),
+          reformat_for_plot(tmp_trans,
+                            proteins_of_interest$protein_id[4],
+                            proteins_of_interest$description[4]),
+          nrow = 2,
+          ncol = 2,
+          common.legend = TRUE)
+
+## Define output:
+output <- "results/amp_box_plots.png"
+
+## Save output:
+ggsave(output,
+       height = 8,
+       width = 8)
+```
+
+Run lintr:
+
+```{r, message = FALSE}
+## Run lintr:
+lintr::lint(file = "./Bombus_queen_haemolymph_proteome_amp_boxplots.Rmd")
+```
