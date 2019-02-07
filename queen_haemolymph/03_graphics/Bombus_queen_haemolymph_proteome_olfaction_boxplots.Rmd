@@ -13,7 +13,7 @@ The purpose of this script is to take label-free quantification (LFQ) values fro
 
 ```{r}
 # Load libraries; install from scratch if needed
-libraries <- c("ggplot2", "ggfortify", "RColorBrewer", "ggpubr", "reshape")
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer", "ggpubr", "reshape", "matrixStats")
 for (lib in libraries) {
     if (require(package = lib, character.only = TRUE)) {
         print("Successful")
@@ -49,6 +49,39 @@ haem_data_df <- as.data.frame(t(haem_data_subset))
 ## Add a column indicating life-cycle 'stage':
 rownames(haem_data_df)
 
+## The dataframe needs to be rearranged for boxplots:
+## Subset based on a list of proteins:
+proteins_of_interest <- read.table(file = "data/olfaction_proteins.txt",
+                              header = FALSE)
+
+## Update column names:
+colnames(proteins_of_interest) <- c("description", "protein_id")
+
+## Calculate z_scores:
+class(haem_data_subset)
+test_sd <- transform(as.matrix(haem_data_subset),
+          SD = rowSds(as.matrix(haem_data_subset),
+                    na.rm = TRUE))
+
+test_mean <- transform(as.matrix(test_sd),
+                       mean = rowMeans(as.matrix(test_sd[, 1:24]),
+                                 na.rm = TRUE))
+
+## For eac column, substract the row mean and divide by the standard deviation:
+for (row in 1:nrow(test_mean)){
+        print(row)
+        test_mean[row, ] <- (test_mean[row, ] - test_mean$mean[row]) / test_mean$SD[row]
+}
+
+## Remove mean and SD:
+test_mean$SD <- NULL
+test_mean$mean <- NULL
+
+## Transpose:
+test_mean_trans <- t(test_mean)
+
+# Subset proteins of interest:
+
 ## Create a vector of life-cycle stages:
 stage <- c(rep("gyne", 4),
            rep("prediapause", 4),
@@ -68,16 +101,16 @@ haem_data_df$stage <- factor(haem_data_df$stage, levels = c(unique(as.character(
 
 ```{r, message = FALSE}
 ## Subset based on a list of proteins:
-proteins_of_interest <- read.table(file = "data/olfaction_proteins.txt",
+proteins_of_interest <- read.table(file = "data/muscle_proteins.txt",
                               header = FALSE)
 
 ## Update column names:
 colnames(proteins_of_interest) <- c("description", "protein_id")
 
 ## Calculate z_scores:
-class(lfq_values_subset)
-test_sd <- transform(as.matrix(lfq_values_subset),
-          SD = rowSds(as.matrix(lfq_values_subset),
+class(haem_data_subset)
+test_sd <- transform(as.matrix(haem_data_subset),
+          SD = rowSds(as.matrix(haem_data_subset),
                     na.rm = TRUE))
 
 test_mean <- transform(as.matrix(test_sd),
@@ -98,63 +131,84 @@ test_mean$mean <- NULL
 tmp <- subset(test_mean, row.names(test_mean)
               %in% proteins_of_interest$protein_id)
 
-tmp$description <- row.names(tmp)
+## Transpose:
+tmp_trans <- t(tmp)
 
-## Subset protein names:
-colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
-                   rep("Prediapause", 4),
-                   rep("Early diapause", 4),
-                   rep("Late diapause", 4),
-                   rep("6 hrs postdiapause", 4),
-                   rep("48 hours postdiapause", 4),
-                   "description")
-
-## Make sure it is a dataframe:
-tmp_df <- as.data.frame(tmp)
-
-## Reshape for plotting:
-tmp_df_melt <- t(tmp_df)
-
-## Update column names:
-colnames(tmp_df_melt) <- c("Protein", "Life_Stage", "Normalised_LFQ")
-
-bp <- ggplot(tmp_df_melt,
-             aes(x = Life_Stage,
-                 y = Normalised_LFQ,
-                 group = Life_Stage)) + 
-        geom_boxplot(aes(fill = Life_Stage))
-
-bp + facet_grid(. ~ Protein)
-
-
-bp <- ggplot(tmp_df_melt,
-                       aes(x = Life_Stage,
-                           y = Normalised_LFQ,
-                           aes(fill = Life_Stage))) +
-                #geom_boxplot(aes(fill = Life_Stage)) +
-                     geom_boxplot() +
+## For each proteins reformat:
+reformat_for_plot <- function(input, protein){
+        print(protein)
+        protein_tmp <- input[,protein]
+        gyne <- protein_tmp[1:4]
+        prediapause <- protein_tmp[5:8]
+        early_diapause<- protein_tmp[9:12]
+        late_diapause<- protein_tmp[13:16]
+        early_postdiapause<- protein_tmp[17:20]
+        late_postdiapause<- protein_tmp[21:24]
+        ## Recombine
+        protein_df <- cbind(gyne,
+                            prediapause,
+                            early_diapause,
+                            late_diapause,
+                            early_postdiapause,
+                            late_postdiapause)
+        ## Rename columns:
+        colnames(protein_df) <- c("gyne",
+                                  "prediapause",
+                                  "early_diapause",
+                                  "late_diapause",
+                                  "early_postdiapause",
+                                  "late_postdiapause")
+        ## Make sure it is a dataframe:
+        protein_df <- as.data.frame(protein_df)
+        ## Reshape for plotting:
+        protein_df_melt <- melt(protein_df)
+        ## Update column names:
+        colnames(protein_df_melt) <- c("Life_stage", "Log2_values")
+        ## Plot:
+        protein_plot <- ggplot(protein_df_melt, aes(x = Life_stage,
+                                                    y = Log2_values,
+                                                    fill = Life_stage)) + 
+                geom_boxplot() +
                 xlab("Life stage") +
-                ylab("Normalised values") +
+                ylab("Normalised z-scores") +
                 #ylim(c(24,35)) +
                 theme(legend.position="none") +
-                ggtitle("Olfaction-related proteins") +
-                scale_fill_brewer(type = "qual",
+                ggtitle(protein) +
+                scale_fill_brewer(type="qual",
                                   palette = "RdBu") +
                 theme_bw() +
                 theme(legend.position = "top")
+        protein_plot <- protein_plot +
+                theme(axis.text=element_text(size = 10),
+                axis.title= element_text(size = 10,
+                                         face = "bold"), 
+                axis.text.x = element_blank(),
+                plot.title = element_text(size=10))
+        ## Return plot:
+        print(protein_plot)
+}
 
-bp <- bp +
-                theme(axis.text=element_text(size=15),
-                axis.title= element_text(size=15,face="bold"), 
-                axis.text.x = element_blank())
+length(proteins_of_interest$protein_id)
 
-bp + facet_grid(. ~ Protein, scales = "free", space = "free")
+## Print all proteins of interest together:
+ggarrange(reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[1]), 
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[2]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[3]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[4]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[5]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[6]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[7]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[8]),
+          reformat_for_plot(tmp_trans, proteins_of_interest$protein_id[9]),
+          nrow = 3,
+          ncol = 3,
+          common.legend = TRUE)
 
 ## Define output:
-output <- "results/olfaction_box_plots.png"
+output <- "results/muscle_box_plots.png"
 
 ## Save output:
 ggsave(output,
        height = 10,
-       width = 20)
+       width = 15)
 ```
