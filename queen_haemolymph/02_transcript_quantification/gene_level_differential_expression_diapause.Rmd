@@ -191,6 +191,13 @@ mated_vs_diapause_lrt_sig <- subset(mated_vs_diapause_lrt,
                                     padj < 0.05)
 nrow(mated_vs_diapause_lrt_sig)
 
+## Write to output:
+write.table(mated_vs_diapause_lrt_sig,
+            file = "results/de_genes_pre_vs_diapause.sig_lrt_only.txt",
+            row.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
+
 mated_vs_diapause_wt_sig <- subset(mated_vs_diapause_wt,
                                     padj < 0.05)
 nrow(mated_vs_diapause_wt_sig)
@@ -230,6 +237,15 @@ post_vs_diapause_lrt_sig <- subset(post_vs_diapause_lrt,
                                     padj < 0.05)
 nrow(post_vs_diapause_lrt_sig)
 
+## Output results of LRT:
+## Write to output:
+write.table(post_vs_diapause_lrt_sig,
+            file = "results/de_genes_post_vs_diapause.sig_lrt_only.txt",
+            row.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
+
+## Subset significant genes according to the Wald test:
 post_vs_diapause_wt_sig <- subset(post_vs_diapause_wt,
                                     padj < 0.05)
 nrow(post_vs_diapause_wt_sig)
