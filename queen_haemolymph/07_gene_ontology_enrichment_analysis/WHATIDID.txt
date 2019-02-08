@@ -43,3 +43,13 @@ mkdir post_vs_diapause
 cd pre_vs_diapause
 cp -p ../go_enrichment_analysis.Rmd .
 open go_enrichment_analysis.Rmd
+cd ../
+
+## For running gene ontology enrichment on genes that change throughout the three queen time-points:
+mkdir lrt_output
+cd lrt_output
+ln -s ../../../../2019-01-24_proteomics_transcriptomics_diapause/results/2019-01-25_differential_expression_analysis/results/de_genes_post_vs_diapause.sig_lrt_only.txt .
+cp -p ../post_vs_diapause/go_enrichment_analysis.Rmd .
+open go_enrichment_analysis.Rmd
+grep -v 'baseMean' de_genes_post_vs_diapause.sig_lrt_only.txt | awk '{ print $1,$6 }' | tr ' ' '\t' | > de_genes_post_vs_diapause.sig_lrt_only_input_for_go.txt
+
