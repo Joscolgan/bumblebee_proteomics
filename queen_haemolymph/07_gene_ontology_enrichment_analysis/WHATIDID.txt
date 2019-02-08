@@ -30,3 +30,16 @@ mv sig_haemolymph_associated_genes.t* sig_haemolymph_analysis
 cd sig_haemolymph_analysis
 mv sig_haemolymph_associated_genes.tmp sig_haemolymph_associated_genes.txt
 cp -p ../all_haemolymph_analysis/go_enrichment_analysis.Rmd .
+open go_enrichment_analysis.Rmd
+
+## For running gene ontology enrichment for transcriptomic datasets:
+mkdir fat_body_transcriptome_analysis
+ln -s ../../../2019-01-24_proteomics_transcriptomics_diapause/results/2019-01-25_differential_expression_analysis/results/de_genes_post_vs_diapause.input_for_go.txt .
+ln -s ../../../2019-01-24_proteomics_transcriptomics_diapause/results/2019-01-25_differential_expression_analysis/results/de_genes_pre_vs_diapause.input_for_go.txt .
+cp -p
+cp -p ../sig_haemolymph_analysis/go_enrichment_analysis.Rmd .
+mkdir pre_vs_diapause
+mkdir post_vs_diapause
+cd pre_vs_diapause
+cp -p ../go_enrichment_analysis.Rmd .
+open go_enrichment_analysis.Rmd
