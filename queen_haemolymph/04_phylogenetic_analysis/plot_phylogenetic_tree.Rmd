@@ -34,7 +34,7 @@ Read in data:
 
 ```{r}
 ## Read newick alignment file in and store as variable:
-tree <- read.tree("./data/hahp_phylogeny_newick_format.txt")
+tree <- read.tree("./data/hahp_phylogeny_newick_format_new_names.txt")
 
 ## Inspect internal nodes:
 p <- ggtree(tree) + geom_text2(aes(subset=!isTip,
