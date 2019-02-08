@@ -214,13 +214,14 @@ write.table(overlap_sig_pre_df,
             quote = FALSE)
 
 ## Subset gene name and pvalues for gene ontology analysis:
-overlap_pre_for_go <- as.data.frame(cbind(rownames(overlap_sig_post_df),
-                                          overlap_sig_post_df$pvalue))
+overlap_pre_for_go <- as.data.frame(cbind(rownames(overlap_sig_pre_df),
+                                          overlap_sig_pre_df$pvalue))
 
 ## Write to output:
 write.table(overlap_pre_for_go,
             file = "results/de_genes_pre_vs_diapause.input_for_go.txt",
-            row.names = TRUE,
+            row.names = FALSE,
+            col.names = FALSE,
             sep = "\t",
             quote = FALSE)
 
@@ -258,7 +259,8 @@ overlap_post_for_go <- as.data.frame(cbind(rownames(overlap_sig_post_df),
 ## Write to output:
 write.table(overlap_post_for_go,
             file = "results/de_genes_post_vs_diapause.input_for_go.txt",
-            row.names = TRUE,
+            row.names = FALSE,
+            col.names = FALSE,
             sep = "\t",
             quote = FALSE)
 ```
