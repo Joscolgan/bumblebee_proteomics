@@ -25,7 +25,8 @@ This can then be used for further analysis.
 libraries <- c("tximport", "readr", "DESeq2",
                "ggplot2", "gplots", "rhdf5",
                "plyr", "ggfortify", "biomaRt",
-               "vsn", "RColorBrewer", "ReportingTools")
+               "vsn", "RColorBrewer", "ReportingTools",
+               "lintr")
 for (lib in libraries) {
     if (require(package = lib, character.only = TRUE)) {
         print("Successful")
@@ -102,7 +103,7 @@ We used kallisto to obtain estimated counts for each transcript in each conditio
 We load these raw counts into R for DEseq using tximport. 
 Because we do a gene-level analysis first, transcript abundances are summarised per gene during import.
 
-```{r}
+```{r, message = FALSE}
 ## Read in genes and corresponding RNA ids:
 transcript_to_gene <- read.table(file = "./rna_and_corresponding_genes.txt",
                                  header = FALSE)
@@ -140,7 +141,7 @@ Within the present analysis, four questions can be immediately asked:
     1. What genes are differentially expressed within clothianidin-exposed workers in comparison to control?
     2. What genes are differentially expressed within imidacloprid-exposed workers in comparison to control?
 
-```{r}
+```{r, message = FALSE}
 ## Construct DESeq data set from txi object and sample information:
 deseq_txi <- DESeqDataSetFromTximport(txi     = txi_counts,
                                       colData = samples_information,
@@ -212,6 +213,17 @@ write.table(overlap_sig_pre_df,
             sep = "\t",
             quote = FALSE)
 
+## Subset gene name and pvalues for gene ontology analysis:
+overlap_pre_for_go <- as.data.frame(cbind(rownames(overlap_sig_post_df),
+                                          overlap_sig_post_df$pvalue))
+
+## Write to output:
+write.table(overlap_pre_for_go,
+            file = "results/de_genes_pre_vs_diapause.input_for_go.txt",
+            row.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
+
 ## Subset genes identified using both approaches:
 post_vs_diapause_lrt_sig <- subset(post_vs_diapause_lrt,
                                     padj < 0.05)
@@ -239,7 +251,16 @@ write.table(overlap_sig_post_df,
             sep = "\t",
             quote = FALSE)
 
-
+## Extract name and pvalue for gene ontology enrichment analysis:
+overlap_post_for_go <- as.data.frame(cbind(rownames(overlap_sig_post_df),
+                                           overlap_sig_post_df$pvalue))
+                                     
+## Write to output:
+write.table(overlap_post_for_go,
+            file = "results/de_genes_post_vs_diapause.input_for_go.txt",
+            row.names = TRUE,
+            sep = "\t",
+            quote = FALSE)
 ```
 
 Generate plot using principal components calculated for transcriptomes from all queens:
@@ -288,6 +309,5 @@ Check style guide as a final step
 
 ```{r, message = FALSE}
 ## Run lintr:
-library(lintr)
 lintr::lint("./gene_level_differential_expression_diapause.Rmd")
 ```
