@@ -11,7 +11,7 @@ The purpose of this script is to take label-free quantification (LFQ) values fro
 
 Load libraries:
 
-```{r}
+```{r, message = FALSE}
 # Load libraries; install from scratch if needed
 libraries <- c("ggplot2", "ggfortify", "RColorBrewer",
                "ggpubr", "reshape", "matrixStats")
@@ -122,11 +122,11 @@ reformat_for_plot <- function(input,
                             late_postdiapause)
         ## Rename columns:
         colnames(protein_df) <- c("gyne",
-                                  "prediapause",
-                                  "early_diapause",
-                                  "late_diapause",
-                                  "early_postdiapause",
-                                  "late_postdiapause")
+                                  "pre-diapause",
+                                  "early diapause",
+                                  "late diapause",
+                                  "6 hours postdiapause",
+                                  "48 hours postdiapause")
         ## Make sure it is a dataframe:
         protein_df <- as.data.frame(protein_df)
         ## Reshape for plotting:
