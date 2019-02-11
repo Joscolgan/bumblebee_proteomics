@@ -89,11 +89,11 @@ row.names(tmp) <- gsub("_",
 
 ## Subset protein names:
 colnames(tmp) <- c(rep("Virgin queen (Gyne)", 4),
-                   rep("Prediapause", 4),
+                   rep("Pre-diapause", 4),
                    rep("Early diapause", 4),
                    rep("Late diapause", 4),
                    rep("6 hrs postdiapause", 4),
-                   rep("48 hours postdiapause", 4))
+                   rep("48 hrs postdiapause", 4))
 
 ## Reshape:
 tmp_melt <- melt(t(tmp))
@@ -104,11 +104,11 @@ colnames(tmp_melt) <- c("Stage", "Protein_id", "LFQ")
 ## Plot line plot:
 tmp_melt$Stage <- factor(tmp_melt$Stage,
                          levels = c("Virgin queen (Gyne)",
-                                    "Prediapause",
+                                    "Pre-diapause",
                                     "Early diapause",
                                     "Late diapause",
                                     "6 hrs postdiapause",
-                                    "48 hours postdiapause"))
+                                    "48 hrs postdiapause"))
 
 ## Summarise LFQ values to get standard deviation, standard error of the mean and a default (95%) confidence interval:      
 tmp_melt_SE <- summarySE(tmp_melt,
@@ -168,8 +168,8 @@ output <- "results/olfaction_line_plot.png"
 
 ## Save output:
 ggsave(output,
-       height = 7,
-       width = 15)
+       height = 8,
+       width = 16)
 ```
 
 Run lintr:
