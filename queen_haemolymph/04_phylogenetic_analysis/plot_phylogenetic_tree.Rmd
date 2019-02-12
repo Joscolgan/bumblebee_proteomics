@@ -23,35 +23,31 @@ for (lib in libraries) {
                 library(lib, character.only = TRUE )
         }
 }
-
-## For installing ggtree:
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install("ggtree", version = "3.8")
 ```
 
 Read in data:
 
-```{r}
+```{r, message = FALSE}
 ## Read newick alignment file in and store as variable:
 tree <- read.tree("./data/hahp_phylogeny_newick_format_new_names.txt")
 
 ## Inspect internal nodes:
-p <- ggtree(tree) + geom_text2(aes(subset=!isTip,
-                              label=node),
-                          hjust=-.3) + geom_tiplab()
-p
+p <- ggtree(tree) + geom_text2(aes(subset = !isTip,
+                              label = node),
+                              hjust = -.3) + geom_tiplab()
 
-viewClade(p+geom_tiplab(), node=21)
+## Command for examing location of node:
+viewClade(p + geom_tiplab(),
+          node = 21)
 
-tree <- groupClade(tree, .node=49)
-ggtree(tree, aes(color=group, linetype=group))
+## Annotation tip label for plotting species name:
+groupInfo <- split(tree$tip.label,
+                   gsub("_\\w+", "", tree$tip.label))
 
-groupInfo <- split(tree$tip.label, gsub("_\\w+", "", tree$tip.label))
-
+## Plot tree:
 tree <- groupOTU(tree, groupInfo)
-ggtree(tree, aes(color=group), layout='circular') + 
-        geom_tiplab(size = 3, aes(angle=angle)) +
+ggtree(tree, aes(color = group), layout = "circular") +
+        geom_tiplab(size = 3, aes(angle = angle)) +
         geom_treescale(fontsize = 1, offset = 3.5)
 
 ## Define output:
@@ -62,3 +58,9 @@ ggsave(output,
        height = 10,
        width = 10)
 ```
+Run lintr
+
+```{r, message = TRUE}
+lintr::lint(file = "./plot_phylogenetic_tree.Rmd")
+```
+
