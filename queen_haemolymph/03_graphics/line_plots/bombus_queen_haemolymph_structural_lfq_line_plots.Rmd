@@ -143,6 +143,10 @@ line_plot <- ggplot(tmp_melt_SE,
 line_plot <- line_plot +
         scale_color_brewer(palette = "Spectral")
 
+## Add label:
+annotated_line_plot <- ggarrange(line_plot,
+                                 labels = c("B"))
+
 ## Define output:
 output <- "results/muscle_lfq_line_plot.png"
 
@@ -150,8 +154,8 @@ output <- "results/muscle_lfq_line_plot.png"
 ggsave(output,
        height = 8,
        width = 13)
-       
-## Save output for generating a combined plot:
+
+## Save output:
 save(line_plot, file = "results/structural_lfq_line_plot.Rdata")
 ```
 
