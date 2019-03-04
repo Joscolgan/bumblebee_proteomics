@@ -229,6 +229,9 @@ output <- "results/olfaction_lfq_box_plots.png"
 ggsave(output,
        height = 8,
        width = 12)
+       
+## Save plot:
+save(combined_boxplot, file = "results/olfaction_lfq_box_plot.Rdata")
 ```
 
 Run lintr:
