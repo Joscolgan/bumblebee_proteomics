@@ -150,6 +150,9 @@ output <- "results/muscle_lfq_line_plot.png"
 ggsave(output,
        height = 8,
        width = 13)
+       
+## Save output for generating a combined plot:
+save(line_plot, file = "results/structural_lfq_line_plot.Rdata")
 ```
 
 Run lintr:
