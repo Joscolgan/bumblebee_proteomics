@@ -1,0 +1,311 @@
+--- 
+title: "Bombus haemolymph diapause study"
+output: plot_pca.html
+authors: Joe Colgan (joscolgan)
+--- 
+
+Introduction:
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, Perseus, normalise and perform a principal component analysis. Two principal components are then plotted using the R package, ggplot2. 
+
+```{r}
+# Load libraries; install from scratch if needed
+libraries <- c("ggplot2", "ggfortify", "RColorBrewer", "ggpubr")
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        biocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+dir.create("results")
+```
+
+1. Read in input data:
+
+```{r}
+## Read in data and store as a dataframe:
+haem_data <- read.table(file = "input/diapause_results_111118_for_pca.txt",
+                        header = TRUE)
+
+## Assign the first column containing protein_id to the rowname:
+rownames(haem_data) <- haem_data$T._Protein_ID
+
+## Remove the protein ID column:
+haem_data$T._Protein_ID <- NULL
+haem_data$T._Fasta_headers <- NULL 
+
+## Transpose:
+haem_data_df <- as.data.frame(t(haem_data))
+
+## Add a column indicating life-cycle 'stage':
+rownames(haem_data_df)
+
+## Update stage:
+life_stages <- c(rep("gyne", 4),
+                 rep("pre-diapause", 4),
+                 rep("early diapause", 4),
+                 rep("late diapause", 4),
+                 rep("6 hrs postdiapause", 4),
+                 rep("48 hours postdiapause", 4))
+
+## Add column for life cycle stage:
+haem_data_df$life_stages <- life_stages 
+
+## Add levels for plotting:
+haem_data_df$life_stages <- factor(haem_data_df$life_stages,
+                             levels = c(unique(as.character(unlist(haem_data_df$life_stages)))))
+
+## Subset for plotting:
+haem_data_subset <- haem_data_df[, c(1:79)]
+```
+
+2. Perform PCA and plot:
+
+```{r}
+## Perform PCA:
+haem_data_subset_pca <- prcomp(haem_data_subset,
+                               center = TRUE,
+                               scale. = TRUE) 
+
+## Plot all principal components:
+plot(haem_data_subset_pca,
+     type = "l")
+```
+
+Plot a number of principal components:
+
+```{r}
+## Plot
+pca_plot_1_2 <- autoplot(prcomp(haem_data_subset),
+                         x = 1,
+                         y = 2,
+                         data = haem_data_df,
+                         colour = "life_stages",
+                         fill = "black",
+                         size = 4) +
+        scale_color_brewer(type = "qual",
+                           palette = "RdBu") +
+        geom_point(aes(colour = haem_data_df$life_stages),
+                   size = 6) + 
+        geom_point(shape = 1,
+                   size = 6,
+                   colour = "black") +
+        theme_bw() +
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15,
+                                        face = "bold"))
+
+## Plot principal components 1 and 3:
+pca_plot_1_3 <- autoplot(prcomp(haem_data_subset),
+                         x = 1,
+                         y = 3,
+                         data = haem_data_df,
+                         colour = "life_stages",
+                         fill = "black",
+                         size = 4) +
+        scale_color_brewer(type = "qual",
+                           palette = "RdBu") +
+        geom_point(aes(colour = haem_data_df$life_stages),
+                   size = 6) + 
+        geom_point(shape = 1,
+                   size = 6,
+                   colour = "black") +
+        theme_bw() +
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15,
+                                        face = "bold"))
+
+## Plot principal components 1 and 4:
+pca_plot_1_4 <- autoplot(prcomp(haem_data_subset),
+                         x = 1,
+                         y = 4,
+                         data = haem_data_df,
+                         colour = "life_stages",
+                         fill = "black",
+                         size = 4) +
+        scale_color_brewer(type = "qual",
+                           palette = "RdBu") +
+        geom_point(aes(colour = haem_data_df$life_stages),
+                   size = 6) + 
+        geom_point(shape = 1,
+                   size = 6,
+                   colour = "black") +
+        theme_bw() +
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15,
+                                        face = "bold"))
+
+## Plot principal components 1 and 5:
+pca_plot_1_5 <- autoplot(prcomp(haem_data_subset),
+                         x = 1,
+                         y = 5,
+                         data = haem_data_df,
+                         colour = "life_stages",
+                         fill = "black",
+                         size = 4) +
+        scale_color_brewer(type = "qual",
+                           palette = "RdBu") +
+        geom_point(aes(colour = haem_data_df$life_stages),
+                   size = 6) + 
+        geom_point(shape = 1,
+                   size = 6,
+                   colour = "black") +
+        theme_bw() +
+        theme(axis.text = element_text(size = 15),
+              axis.title = element_text(size = 15,
+                                        face = "bold"))
+```
+
+Plot together:
+
+```{r}
+## Plot together:
+ggarrange(pca_plot_1_2,
+          pca_plot_1_3,
+          pca_plot_1_4,
+          pca_plot_1_5,
+          labels = c("A",
+                     "B",
+                     "C",
+                     "D"),
+          nrow = 2,
+          ncol = 2,
+          common.legend = TRUE)
+
+## Save as a .png file:
+ggsave(file="results/pca_1_5_haemolymph_life_cycles_RdBu.png",
+       height = 10,
+       width = 10)
+
+```
+
+Look at additional components:
+
+```{r}
+## Plot
+pca_plot_2_3 <- autoplot(prcomp(haem_data_subset), x=2, y=3,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 3 and 4:
+pca_plot_3_4 <- autoplot(prcomp(haem_data_subset), x=3, y=4,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 4 and 5:
+pca_plot_4_5 <- autoplot(prcomp(haem_data_subset), x=4, y=5,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot principal components 1 and 5:
+pca_plot_5_6 <- autoplot(prcomp(haem_data_subset), x=5, y=6,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data_df, 
+         colour = "stage",
+         fill = "black",
+         size = 4) +
+         #label = TRUE) +
+        scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(aes(colour=haem_data_df$stage), size = 6) + 
+        geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw() +
+        theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+## Plot together:
+ggarrange(pca_plot_2_3,
+          pca_plot_3_4,
+          pca_plot_4_5,
+          pca_plot_5_6,
+          labels = c("A", "B", "C", "D"),
+          nrow = 2, ncol =2,
+          common.legend = TRUE)
+
+ggsave(file="pca_2_6_combo_haemolymph_life_cycles.png",
+       height = 10,
+       width = 10)
+
+
+```
+
+Look at movement of individual proteins:
+
+```{r}
+## Perform PCA:
+haem_data_pca <- prcomp(haem_data,
+                 center = TRUE,
+                 scale. = TRUE) 
+
+## Plot all principal components:
+plot(haem_data_pca, type = "l")
+
+## Perform PCA and plot first two components:
+pca_plot <- autoplot(prcomp(haem_data), x=1, y=3,
+                #scale. = TRUE,
+                #center = TRUE), 
+         data=haem_data, 
+         #colour = "stage",
+         #fill = "black",
+         size = 2, 
+         label = FALSE) +
+        #scale_color_brewer(type="qual", palette="RdBu") +
+        geom_point(size = 1) + 
+        #geom_point(shape = 1,size = 6,colour = "black") +
+        theme_bw()
+
+## Increase the font size:
+pca_plot<- pca_plot +
+                theme(axis.text=element_text(size=15),
+                axis.title= element_text(size=15,face="bold"))
+
+pca_plot
+
+
+ggplot(data = haem_data_pca, aes(x = PC1, y = PC2))+
+        geom_point()
+
+## Sort by first principal componenet:
+sort(haem_data_pca$x[,1])
+
+
+```
+
+
+
