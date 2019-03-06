@@ -1,0 +1,65 @@
+---
+title: "Bombus haemolymph diapause study"
+output: plot_phylogenetic_tree_expanded.html
+authors: Joe Colgan (joscolgan)
+---
+
+Introduction:
+=============
+The purpose of this script is to take a newick-aligned dataset of protein sequences and plot the phylogeny. 
+
+Load libraries:
+
+```{r, message = FALSE}
+## Load libraries:
+libraries <- c("ggplot2", "ggtree", "lintr")
+for (lib in libraries) {
+        if (require(package = lib, character.only = TRUE)) {
+                print("Successful")
+        } else {
+                print("Installing")
+                source("https://bioconductor.org/biocLite.R")
+                biocLite(pkgs = lib)
+                library(lib, character.only = TRUE )
+        }
+}
+```
+
+Read in data:
+
+```{r, message = FALSE}
+## Read newick alignment file in and store as variable:
+tree <- read.tree("./data/expanded_input_for_ggtree.txt")
+
+## Inspect internal nodes:
+p <- ggtree(tree) + geom_text2(aes(subset = !isTip,
+                              label = node),
+                              hjust = -.3) + geom_tiplab()
+
+## Command for examing location of node:
+viewClade(p + geom_tiplab(),
+          node = 21)
+
+## Annotation tip label for plotting species name:
+groupInfo <- split(tree$tip.label,
+                   gsub("_\\w+", "", tree$tip.label))
+
+## Plot tree:
+tree <- groupOTU(tree, groupInfo)
+ggtree(tree, aes(color = group), layout = "circular") +
+        geom_tiplab(size = 3, aes(angle = angle)) +
+        geom_treescale(fontsize = 1, offset = 3.5)
+
+## Define output:
+output <- "results/phylo_plot_expanded.png"
+
+## Save output:
+ggsave(output,
+       height = 10,
+       width = 10)
+```
+Run lintr
+
+```{r, message = TRUE}
+lintr::lint(file = "./plot_phylogenetic_tree.Rmd")
+```
