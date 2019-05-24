@@ -10,8 +10,12 @@ The purpose of this script is to take label-free quantitative (LFQ) values as in
 
 ```{r, message = FALSE}
 ## Load libraries:
-libraries <- c("lintr", "ggplot2", "ggpubr",
-               "reshape", "Rmisc", "matrixStats")
+libraries <- c("lintr",
+               "ggplot2",
+               "ggpubr",
+               "reshape",
+               "Rmisc",
+               "matrixStats")
 for (lib in libraries) {
         if (require(package = lib, character.only = TRUE)) {
                 print("Successful")
@@ -115,33 +119,33 @@ line_plot <- ggplot(tmp_melt_SE,
                         y = LFQ,
                         colour = Protein_id,
                         group = Protein_id)) +
-        geom_errorbar(aes(ymin = LFQ - se,
-                          ymax = LFQ + se),
-                      colour = "black",
-                      width = .1,
-                      position = pd) +
-        geom_line(position = pd,
-                  size = 1.5) +
-        geom_point(position = pd,
-                   size = 3,
-                   shape = 21) + # 21 is filled circle
-        ylab("LFQ intensities") +
-        theme_bw() +
-        theme(legend.position = "bottom",
-              legend.text = element_text(size = 13),
-              legend.title = element_text(size = 15),
-              axis.title.x = element_blank(),
-              axis.text.x = element_text(angle = 45,
-                                         hjust = 1,
-                                         size = 12,
-                                         face = "bold"),
-              axis.title.y = element_text(face = "bold",
-                                          size = 12),
-              axis.text.y = element_text(size = 12))
+                    geom_errorbar(aes(ymin = LFQ - se,
+                                      ymax = LFQ + se),
+                                  colour = "black",
+                                  width = .1,
+                                  position = pd) +
+                    geom_line(position = pd,
+                              size = 1.5) +
+                    geom_point(position = pd,
+                               size = 3,
+                               shape = 21) + # 21 is filled circle
+                    ylab("LFQ values") +
+                    theme_bw() +
+                    theme(legend.position = "bottom",
+                          legend.text = element_text(size = 13),
+                          legend.title = element_text(size = 15),
+                          axis.title.x = element_blank(),
+                          axis.text.x = element_text(angle = 45,
+                                                     hjust = 1,
+                                                     size = 12,
+                                                     face = "bold"),
+                          axis.title.y = element_text(face = "bold",
+                                                      size = 12),
+                          axis.text.y = element_text(size = 12))
 
 ## Change the colour pallete of the plot:
 line_plot <- line_plot +
-        scale_color_brewer(palette = "Spectral")
+             scale_color_brewer(palette = "Spectral")
 
 ## Add label:
 annotated_line_plot <- ggarrange(line_plot,
