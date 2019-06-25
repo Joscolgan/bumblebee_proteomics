@@ -18,7 +18,10 @@ This script takes a tab-delimited file as input containing the following columns
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
-libraries <- c("gggenes", "ggplot2", "lintr", "ggpubr")
+libraries <- c("gggenes",
+               "ggplot2",
+               "lintr",
+               "ggpubr")
 for (lib in libraries) {
     if (require(package = lib, character.only = TRUE)) {
         print("Successful")
