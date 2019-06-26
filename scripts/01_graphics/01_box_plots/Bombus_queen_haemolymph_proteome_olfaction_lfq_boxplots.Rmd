@@ -144,7 +144,8 @@ reformat_for_plot <- function(input,
                 axis.text.x = element_blank(),
                 legend.title = element_text(size = 10,
                                            face = "bold"),
-                plot.title = element_text(size = 10))
+                plot.title = element_text(size = 10)) +
+                labs(color = "Life stages")
         ## Add significance values:
         protein_plot <- protein_plot +
                 geom_signif(comparisons = list(c(compare_1,
@@ -235,10 +236,11 @@ combined_boxplot <- annotate_figure(combined_boxplot,
 )
 
 ## Define output:
-output <- "results/olfaction_lfq_box_plots.png"
+output <- "results/olfaction_lfq_box_plots.pdf"
 
 ## Save output:
 ggsave(output,
+       dpi = 600,
        height = 10,
        width = 12)
 
