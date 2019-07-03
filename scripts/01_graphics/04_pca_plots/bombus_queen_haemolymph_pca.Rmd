@@ -1,6 +1,6 @@
 --- 
 title: "Bombus haemolymph diapause study"
-output: plot_pca.html
+output: bombus_queen_haemolymph_pca.html
 authors: Joe Colgan (joscolgan)
 --- 
 
