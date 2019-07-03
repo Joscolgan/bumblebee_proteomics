@@ -1,6 +1,6 @@
 --- 
 title: "Bombus haemolymph diapause study"
-output: gene_level_differential_expression_diapause.html
+output: bombus_queen_haemolymph_proteome_amp_boxplots.html
 authors: Joe Colgan (joscolgan)
 --- 
 
