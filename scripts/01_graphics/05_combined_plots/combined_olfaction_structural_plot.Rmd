@@ -1,6 +1,6 @@
 ---
 title: "Bombus haemolymph diapause study"
-output: gene_level_differential_expression_diapause.html
+output: combined_olfaction_structural_plot.html
 authors: Joe Colgan (joscolgan)
 ---
 
