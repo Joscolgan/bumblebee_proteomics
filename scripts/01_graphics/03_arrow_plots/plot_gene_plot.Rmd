@@ -1,6 +1,6 @@
 --- 
 title: "Bombus haemolymph diapause study"
-output: plot_gene_arrowplot.html
+output: plot_gene_plot.html
 authors:  Joe Colgan (joscolgan)
 --- 
 
