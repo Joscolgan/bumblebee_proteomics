@@ -130,7 +130,8 @@ reformat_for_plot <- function(input,
                 #ylim(c(24,35)) +
                 theme(legend.position = "none") +
                 ggtitle(description) +
-                scale_fill_brewer(type = "qual",
+                scale_fill_brewer(name = "Life stages",
+                                  type = "qual",
                                   palette = "RdBu") +
                 theme_bw() +
                 theme(legend.position = "top")
@@ -200,18 +201,31 @@ ggarrange(reformat_for_plot(tmp_trans,
           common.legend = TRUE)
 
 ## Define output:
-output <- "results/amp_box_plots.pdf"
+output_pdf <- "results/pdf/amp_box_plots.pdf"
 
 ## Save output:
-ggsave(output,
+ggsave(output_pdf,
        dpi = 600,
-       height = 8,
-       width = 8)
+       height = 5,
+       width = 5)
+
+## Output a .png image:
+dir.create(path = "./results/png/",
+           recursive = TRUE)
+
+## Define output:
+output_png <- "results/png/amp_box_plots.png"
+
+## Save output:
+ggsave(output_png,
+       dpi = 600,
+       height = 5,
+       width = 5)
 ```
 
 Run lintr to check style:
 
 ```{r, message = FALSE}
 ## Run lintr:
-lintr::lint(file = "./Bombus_queen_haemolymph_proteome_amp_boxplots.Rmd")
+lintr::lint(file = "./bombus_queen_haemolymph_proteome_amp_boxplots.Rmd")
 ```
