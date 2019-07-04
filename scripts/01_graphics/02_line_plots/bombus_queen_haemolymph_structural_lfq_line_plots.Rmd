@@ -157,16 +157,38 @@ line_plot <- line_plot +
 annotated_line_plot <- ggarrange(line_plot,
                                  labels = c("B"))
 
+## Create output directory:
+dir.create(path = "./results/pdf/",
+           recursive = TRUE)
+
 ## Define output:
-output <- "results/muscle_lfq_line_plot.png"
+output_pdf <- "results/muscle_lfq_line_plot.pdf"
 
 ## Save output:
-ggsave(output,
+ggsave(output_pdf,
+       dpi = 600,
        height = 8,
        width = 13)
 
+## Create output directory:
+dir.create(path = "./results/png/",
+           recursive = TRUE)
+
+## Define output:
+output_png <- "results/muscle_lfq_line_plot.png"
+
 ## Save output:
-save(line_plot, file = "results/structural_lfq_line_plot.Rdata")
+ggsave(output_png,
+       height = 8,
+       width = 13)
+
+## Create output directory:
+dir.create(path = "./results/rdata/",
+           recursive = TRUE)
+
+## Save output:
+save(line_plot,
+     file = "results/rdata/structural_lfq_line_plot.Rdata")
 ```
 
 Run lintr:
