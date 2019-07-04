@@ -29,8 +29,8 @@ Load R objects containing:
 2) A line plot for structural and muscular-related genes.
 
 ```{r, message = FALSE}
-load(file = "./results/olfaction_lfq_box_plot.Rdata")
-load(file = "./results/structural_lfq_line_plot.Rdata")
+load(file = "./results/rdata/olfaction_lfq_box_plot.Rdata")
+load(file = "./results/rdata/structural_lfq_line_plot.Rdata")
 ```
 
 Generate combined plot:
@@ -39,15 +39,36 @@ Generate combined plot:
 ## Generate plot:
 ggarrange(combined_boxplot,
           line_plot,
-          align = "hv",
           ncol = 1,
           nrow = 2,
-          heights = c(2, 1.5),
-          labels = c("A", "B"))
+          heights = c(2.0,
+                      1.5),
+          align = "hv",
+          labels = c("A",
+                     "B"))
+
+## Create output directory:
+dir.create(path = "./results/pdf/",
+           recursive = TRUE)
+
+## Define output:
+output_pdf <- "./results/pdf/figure_5.pdf"
 
 ## Save image:
-ggsave(file = "./results/figure_5.pdf",
+ggsave(file = output_pdf,
        dpi = 600,
+       height = 16,
+       width = 14)
+
+## Create output directory:
+dir.create(path = "./results/png/",
+           recursive = TRUE)
+
+## Define output:
+output_png <- "./results/png/figure_5.png"
+
+## Save image:
+ggsave(file = output_png,
        height = 16,
        width = 14)
 ```
@@ -56,5 +77,4 @@ Run lintr:
 
 ```{r, message = FALSE}
 lintr::lint(file = "./combined_olfaction_structural_plot.Rmd")
-
 ```
