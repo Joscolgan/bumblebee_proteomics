@@ -172,11 +172,28 @@ ggarrange(reformat_for_plot(tmp_trans,
           ncol = 1,
           common.legend = TRUE)
 
+## Create directory for PDF:
+dir.create(path = "./results/pdf/",
+           recursive = TRUE)
+
 ## Define output:
-output <- "results/hahp_box_plots.pdf"
+output_pdf <- "results/pdf/hahp_box_plots.pdf"
 
 ## Save output:
-ggsave(output,
+ggsave(output_pdf,
+       dpi = 600,
+       height = 5,
+       width = 5)
+
+## Output a .png image:
+dir.create(path = "./results/png/",
+           recursive = TRUE)
+
+## Define output:
+output_png <- "results/png/hahp_box_plots.png"
+
+## Save output:
+ggsave(output_png,
        dpi = 600,
        height = 5,
        width = 5)
