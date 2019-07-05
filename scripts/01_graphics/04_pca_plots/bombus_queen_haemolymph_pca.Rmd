@@ -83,7 +83,7 @@ plot(haem_data_subset_pca,
 Plot a number of principal components:
 
 ```{r, message = FALSE}
-## Plot
+## Plot principal components 1 and 2:
 pca_plot_1_2 <- autoplot(prcomp(haem_data_subset),
                          x = 1,
                          y = 2,
@@ -100,11 +100,13 @@ pca_plot_1_2 <- autoplot(prcomp(haem_data_subset),
                    colour = "black") +
         theme_bw() +
         theme(axis.text = element_text(size = 15),
-              legend.title = element_text(size = 10,
+              legend.title = element_text(size = 15,
                                          face = "bold"),
+              legend.text = element_text(size = 12,
+                                         face = "plain"),
               axis.title = element_text(size = 15,
                                         face = "bold")) +
-        labs(color = "Life stages")
+        labs(color = "Life stage")
 
 ## Plot principal components 1 and 3:
 pca_plot_1_3 <- autoplot(prcomp(haem_data_subset),
@@ -123,8 +125,10 @@ pca_plot_1_3 <- autoplot(prcomp(haem_data_subset),
                    colour = "black") +
         theme_bw() +
         theme(axis.text = element_text(size = 15),
-              legend.title = element_text(size = 10,
+              legend.title = element_text(size = 15,
                                          face = "bold"),
+              legend.text = element_text(size = 12,
+                                         face = "plain"),
               axis.title = element_text(size = 15,
                                         face = "bold")) +
         labs(color = "Life stages")
@@ -146,8 +150,10 @@ pca_plot_1_4 <- autoplot(prcomp(haem_data_subset),
                    colour = "black") +
         theme_bw() +
         theme(axis.text = element_text(size = 15),
-              legend.title = element_text(size = 10,
+              legend.title = element_text(size = 15,
                                          face = "bold"),
+              legend.text = element_text(size = 12,
+                                         face = "plain"),
               axis.title = element_text(size = 15,
                                         face = "bold")) +
         labs(color = "Life stages")
@@ -169,8 +175,10 @@ pca_plot_1_5 <- autoplot(prcomp(haem_data_subset),
                    colour = "black") +
         theme_bw() +
         theme(axis.text = element_text(size = 15),
-              legend.title = element_text(size = 10,
+              legend.title = element_text(size = 15,
                                          face = "bold"),
+              legend.text = element_text(size = 12,
+                                         face = "plain"),
               axis.title = element_text(size = 15,
                                         face = "bold")) +
         labs(color = "Life stages")
