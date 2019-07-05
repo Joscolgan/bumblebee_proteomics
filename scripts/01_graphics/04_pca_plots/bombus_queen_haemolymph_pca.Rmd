@@ -5,7 +5,9 @@ authors: Joe Colgan (joscolgan)
 --- 
 
 ## Introduction:
-The purpose of this script is to take label-free quantification (LFQ) values from the software program, Perseus, normalise and perform a principal component analysis. Two principal components are then plotted using the R package, ggplot2. 
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, [Perseus](https://www.biochem.mpg.de/5111810/perseus), normalise and perform a principal component analysis. Two user-defined principal components are then plotted using the R package, [ggplot2](https://ggplot2.tidyverse.org/).  
+Multiple image plots can be generated using [ggpubr](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/).  
+This script outputs a PCA plot in PNG and PDF formats.
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
@@ -174,7 +176,7 @@ pca_plot_1_5 <- autoplot(prcomp(haem_data_subset),
         labs(color = "Life stages")
 ```
 
-Plot together:
+Plot a multi-image plot using ggpubr.
 
 ```{r}
 ## Plot together:
@@ -190,8 +192,27 @@ ggarrange(pca_plot_1_2,
           ncol = 2,
           common.legend = TRUE)
 
+## Create output directory:
+dir.create(path = "results/png/",
+           recursive = TRUE)
+
+## Define output file:
+output_png <- "results/png/figure_2_pca_plot.png"
+
 ## Save as a .png file:
-ggsave(file = "results/figure_2_pca_plot.pdf",
+ggsave(file = output_png,
+       height = 10,
+       width = 10)
+
+## Create output directory:
+dir.create(path = "results/pdf/",
+           recursive = TRUE)
+
+## Define output file:
+output_pdf <- "results/pdf/figure_2_pca_plot.pdf"
+
+## Save as a .png file:
+ggsave(file = output_pdf,
        dpi = 600,
        height = 10,
        width = 10)
