@@ -1,12 +1,11 @@
 --- 
 title: "Bombus haemolymph diapause study"
-output: plot_gene_plot.html
+output: plot_gene_arrowplot.html
 authors:  Joe Colgan (joscolgan)
 --- 
 
 ## Introduction 
-This script takes gene coordinates and generates an arrow-plot using [gggenes](https://cran.r-project.org/web/packages/gggenes/vignettes/introduction-to-gggenes.html).  
-This script outputs a image saved in .png file format.  
+This script takes gene coordinates and generates an arrow-plot as output.
 
 This script takes a tab-delimited file as input containing the following columns:
 1) Chromosome name
@@ -15,6 +14,11 @@ This script takes a tab-delimited file as input containing the following columns
 4) Gene name
 5) Strand
 6) Status - if you want to highlight a gene of interest
+
+N.B. I tested out the code using the example_data that comes with the package and everything worked. Created my own dataframe using the same column headers in R but there was an issue with the plots making all genes
+the same size in the plot. Unsure of what the problem is. Easiest fix
+was to output the example data file and manually change values for plots. 
+No issues since. 
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
@@ -60,13 +64,21 @@ arrow_plot_by_gene <- ggplot(
             label = gene,
             forward = direction)) +
         ylab("Chromosome 1") +
-        geom_gene_arrow(arrowhead_width = grid::unit(10, "mm"),
-                        arrowhead_height = grid::unit(10, "mm"),
-                        arrow_body_height = grid::unit(8, "mm")) +
-        geom_gene_label(align = "left", min.size = 6) +
-        facet_wrap(~ molecule, scales = "free", nrow = 1, shrink = TRUE) +
-        scale_fill_brewer(palette = "Blues") +
-        theme_genes()
+        geom_gene_arrow(arrowhead_height = unit(3, "mm"),
+                        arrowhead_width = unit(1, "mm")) +
+        geom_gene_label(align = "left",
+                        min.size = 6) +
+        facet_wrap(~ molecule,
+                   scales = "free",
+                   nrow = 1,
+                   shrink = TRUE) +
+        scale_fill_brewer(name = "Gene ID",
+                          palette = "Blues") +
+        theme_genes() +
+        theme(legend.title = element_text(size = 10,
+                                          face = "bold"),
+              axis.title = element_text(size = 10,
+                                        face = "bold"))
         
 ## Print to console:
 arrow_plot_by_gene
@@ -80,18 +92,22 @@ arrow_plot_by_group <- ggplot(
             fill = status,
             label = gene,
             forward = direction)) +
-        xlab("Chromosome coordinates") +
+        xlab("Genomic positions (bp)") +
         ylab("Chromosome 1") +
-        geom_gene_arrow(arrowhead_width = grid::unit(10, "mm"),
-                        arrowhead_height = grid::unit(10, "mm"),
-                        arrow_body_height = grid::unit(8, "mm")) +
+        geom_gene_arrow(arrowhead_height = unit(3, "mm"),
+                        arrowhead_width = unit(1, "mm")) +
         geom_gene_label(align = "left", min.size = 6) +
         facet_wrap(~ molecule,
                    scales = "free",
                    nrow = 1,
                    shrink = FALSE) +
-        scale_fill_brewer(palette = "Reds") +
-        theme_genes()
+        scale_fill_brewer(name = "Family member",
+                          palette = "Greys") +
+        theme_genes() +
+        theme(legend.title = element_text(size = 10,
+                                          face = "bold"),
+              axis.title = element_text(size = 10,
+                                        face = "bold"))
 
 ## print to console:
 arrow_plot_by_group
@@ -100,12 +116,26 @@ arrow_plot_by_group
 ggarrange(arrow_plot_by_gene,
           arrow_plot_by_group,
           nrow = 2,
-          align = "v")
+          align = "hv",
+          labels = c("A", "B"))
+
+## Create output directory:
+dir.create(path = "./results/pdf/",
+           recursive = TRUE)
 
 ## Save output:
-ggsave(file = "results/hahp_arrowplot.png",
-       height = 10,
-       width = 20)
+ggsave(file = "results/pdf/hahp_arrowplot.pdf",
+       height = 5,
+       width = 6)
+
+## Create output directory:
+dir.create(path = "./results/png/",
+           recursive = TRUE)
+
+## Save output:
+ggsave(file = "results/png/hahp_arrowplot.png",
+       height = 5,
+       width = 6)
 ```
 
 Run lintr
