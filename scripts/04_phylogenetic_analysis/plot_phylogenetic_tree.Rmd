@@ -4,10 +4,10 @@ output: plot_phylogenetic_tree.html
 authors: Joe Colgan (joscolgan)
 ---
 
-Introduction:
-=============
-The purpose of this script is to take a newick-aligned dataset of protein sequences and plot the phylogeny. The input was generated using [www.phylogeny.fr](http://www.phylogeny.fr/) with the phylogenetic tree visualised using [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html).  
-The script outputs a phylogenetic tree in PNG and PDF format.
+## Introduction:  
+The purpose of this script is to take a newick-aligned dataset of protein sequences and plot the phylogeny.  
+The input was generated using [www.phylogeny.fr](http://www.phylogeny.fr/) with the phylogenetic tree visualised using [ggtree](https://bioconductor.org/packages/release/bioc/html/ggtree.html).  
+The script outputs a phylogenetic tree in PNG and PDF format.  
 
 Load libraries:
 
