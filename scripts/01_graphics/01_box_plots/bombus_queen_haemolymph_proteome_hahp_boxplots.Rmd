@@ -132,7 +132,7 @@ reformat_for_plot <- function(input,
                 ylab("LFQ Intensities") +
                 theme(legend.position = "none") +
                 ggtitle(description) +
-                scale_fill_brewer(name = "Life stages",
+                scale_fill_brewer(name = "Life stage",
                                   type = "qual",
                                   palette = "RdBu") +
                 theme_bw() +
