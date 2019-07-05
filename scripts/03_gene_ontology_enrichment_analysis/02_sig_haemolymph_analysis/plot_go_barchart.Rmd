@@ -5,6 +5,10 @@ authors: Joe Colgan (joscolgan)
 ---
 
 ## Introduction:  
+Scripts adapted from Colgan et al. (2019).  
+Original script repository is here:
+https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment  
+
 This script is for visualisation of the output of gene ontology (GO) analyses using the R package [topGo](https://bioconductor.org/packages/release/bioc/html/topGO.html).
 This script creates a barchart of the number of significant genes annotated to a particular GO term, with an associated p-value.  
 This script takes an input of .csv files containing an output table of GO analyses.
