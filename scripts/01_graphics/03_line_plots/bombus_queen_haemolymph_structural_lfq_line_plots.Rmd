@@ -129,7 +129,7 @@ line_plot <- ggplot(tmp_melt_SE,
                     geom_point(position = pd,
                                size = 3,
                                shape = 21) + # 21 is filled circle
-                    ylab("LFQ values") +
+                    ylab("LFQ intensity") +
                     theme_bw() +
                     theme(legend.position = "bottom",
                           legend.text = element_text(size = 12),
