@@ -129,7 +129,7 @@ reformat_for_plot <- function(input,
                                    fill = Life_stage)) +
                 geom_boxplot() +
                 xlab("Life stage") +
-                ylab("LFQ Intensities") +
+                ylab("LFQ intensity") +
                 theme(legend.position = "none") +
                 ggtitle(description) +
                 scale_fill_brewer(name = "Life stage",
