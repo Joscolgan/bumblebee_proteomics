@@ -203,7 +203,7 @@ combined_boxplot <- ggarrange(reformat_for_plot(tmp_trans,
 
 ## Annotate the figure by adding a common labels
 combined_boxplot <- annotate_figure(combined_boxplot,
-                left = text_grob("LFQ intensities",
+                left = text_grob("LFQ intensity",
                                  color = "black",
                                  rot = 90,
                                  face = "bold",
