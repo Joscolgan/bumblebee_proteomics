@@ -125,7 +125,7 @@ reformat_for_plot <- function(input,
                                                     fill = Life_stage)) +
                 geom_boxplot() +
                 xlab("Life stage") +
-                ylab("LFQ values") +
+                ylab("LFQ intensities") +
                 theme(legend.position = "none") +
                 ggtitle(description) +
                 scale_fill_brewer(name = "Life stage",
@@ -138,6 +138,9 @@ reformat_for_plot <- function(input,
                       axis.title = element_text(size = 12,
                                                 face = "bold"),
                 axis.text.x = element_blank(),
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank(),
+                axis.ticks.x = element_blank(),
                 plot.title = element_text(size = 10),
                 legend.title = element_text(size = 12,
                                            face = "bold"),
@@ -157,7 +160,7 @@ reformat_for_plot <- function(input,
 }
 
 ## Print all proteins of interest together:
-ggarrange(reformat_for_plot(tmp_trans,
+combined_boxplot <- ggarrange(reformat_for_plot(tmp_trans,
                             proteins_of_interest$protein_id[1],
                             proteins_of_interest$description[1],
                             "pre-diapause",
@@ -196,6 +199,20 @@ ggarrange(reformat_for_plot(tmp_trans,
           nrow = 2,
           ncol = 2,
           common.legend = TRUE)
+
+
+## Annotate the figure by adding a common labels
+combined_boxplot <- annotate_figure(combined_boxplot,
+                left = text_grob("LFQ intensities",
+                                 color = "black",
+                                 rot = 90,
+                                 face = "bold",
+                                 size = 15),
+                bottom = text_grob("Life stage",
+                                   color = "black",
+                                   face = "bold",
+                                   size = 15)
+)
 
 
 ## Output a .png image:
