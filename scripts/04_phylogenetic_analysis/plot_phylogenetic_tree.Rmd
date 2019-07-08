@@ -32,16 +32,7 @@ Read in data:
 
 ```{r, message = FALSE}
 ## Read newick alignment file in and store as variable:
-tree <- read.tree("./data/hahp_phylogeny_newick_format_new_names.txt")
-
-## Check and correct erroneous protein names:
-tree$tip.label <- gsub("BT20719545",
-                  "BTER_XP_020719545.1",
-                  tree$tip.label)
-
-tree$tip.label <- gsub("BI280.1",
-                       "BIMP_XP_024222880.1",
-                       tree$tip.label)
+tree <- read.tree("./data/hahp_phylogeny_newick_format_new.txt")
 
 ## Annotation tip label for plotting species name:
 groupInfo <- split(tree$tip.label,
@@ -53,8 +44,8 @@ ggtree(tree, aes(color = group),
        layout = "circular") +
         geom_tiplab(size = 3.2,
                     aes(angle = angle)) +
-        geom_treescale(fontsize = 3)
-        
+        geom_treescale(fontsize = 5)
+
 ## Create output directory:
 dir.create(path = "./results/png/",
            recursive = TRUE)
