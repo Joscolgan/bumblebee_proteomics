@@ -1,0 +1,177 @@
+--- 
+title: "Bombus haemolymph diapause study"
+output: bombus_queen_haemolymph_stats.html
+authors: Joe Colgan (joscolgan)
+--- 
+
+## Introduction:
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, [Perseus](https://www.biochem.mpg.de/5111810/perseus), normalise and perform a principal component analysis. Two user-defined principal components are then plotted using the R package, [ggplot2](https://ggplot2.tidyverse.org/).  
+Multiple image plots can be generated using [ggpubr](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/).  
+This script outputs a PCA plot in PNG and PDF formats.
+
+```{r, message = FALSE}
+# Load libraries; install from scratch if needed
+libraries <- c("lintr",
+               "dplyr")
+for (lib in libraries) {
+    if (require(package = lib, character.only = TRUE)) {
+        print("Successful")
+    } else {
+        print("Installing")
+        source("https://bioconductor.org/biocLite.R")
+        biocLite(pkgs = lib)
+        library(lib, character.only = TRUE )
+    }
+}
+dir.create("results")
+```
+
+Read in input data:
+
+```{r}
+## Read in data and store as a dataframe:
+haem_data <- read.table(file = "input/input_for_plots.txt",
+                        header = TRUE)
+
+## Assign the first column containing protein_id to the rowname:
+rownames(haem_data) <- haem_data$T._Protein_ID
+
+## Remove the protein ID column:
+haem_data$T._Protein_ID <- NULL
+haem_data$T._Fasta_headers <- NULL
+
+## Transpose:
+haem_data_df <- as.data.frame(t(haem_data))
+
+## Add a column indicating life cycle 'stage':
+rownames(haem_data_df)
+
+## Update stage:
+life_stages <- c(rep("gyne", 4),
+                 rep("prediapause", 4),
+                 rep("early_diapause", 4),
+                 rep("late_diapause", 4),
+                 rep("six_hours_postdiapause", 4),
+                 rep("forty_eight_hours_postdiapause", 4))
+
+## Add column for life cycle stage:
+haem_data_df$life_stages <- life_stages
+
+## Add levels for plotting:
+haem_data_df$life_stages <- factor(haem_data_df$life_stages,
+                             levels = c(unique(as.character(unlist(haem_data_df$life_stages)))))
+
+## Subset for plotting:
+haem_data_subset <- haem_data_df[, c(1:79)]
+
+## Perform ANOVA:
+levels(haem_data_df$life_stages)
+
+library(dplyr)
+for (protein in 1:(ncol(haem_data_df) - 1)){
+group_by(haem_data_df, life_stages) %>%
+  summarise(
+    count = n(),
+    mean = mean(haem_data_df[, protein], na.rm = TRUE),
+    sd = sd(haem_data_df[, protein], na.rm = TRUE)
+  )
+}
+
+## Perform a one_way ANOVA: 
+new_df <- data.frame()
+tukey_output <- data.frame()
+tukey_output_df_sig <- data.frame()
+for (protein in 1:(ncol(haem_data_df) - 1)){
+        res.aov <- aov(haem_data_df[, protein] ~ life_stages, data = haem_data_df)
+        new_df <- rbind(unlist(summary(res.aov)), new_df)
+        tukey_output <- TukeyHSD(res.aov)
+        tukey_output_df <- as.data.frame(tukey_output$life_stages)
+        ## Update rowname:
+        rownames(tukey_output_df) <- paste(rownames(tukey_output_df),
+                 "-",
+                 colnames(haem_data_df)[protein],
+                 sep = "")
+        colnames(tukey_output_df) <- c("diff",
+                                       "lwr",
+                                       "upr",
+                                       "p_adj")
+        tukey_output_df$protein <- colnames(haem_data_df)[protein]
+        tukey_output_df_sig <- rbind(tukey_output_df_sig,
+                                     subset(tukey_output_df,
+                                            p_adj < 0.05))
+}
+
+## Update column names:
+colnames(new_df) <- c("DF1",
+                      "DF2",
+                      "sum_sq1",
+                      "sum_sq2",
+                      "mean_sq1",
+                      "mean_sq2",
+                      "f_value1",
+                      "f_value2",
+                      "P_value",
+                      "sig")
+```
+
+Performing a two-sample t-test:
+
+```{r, message = FALSE}
+## Perform two_sample t_tests between consecutive stages:
+p_values_df <- data.frame()
+for (protein in 1:(ncol(haem_data_df) - 1)){
+        comparisons <- pairwise.t.test(haem_data_df[[protein]],
+                haem_data_df$life_stages,
+                 p.adjust.method = "BH")
+        comparisons_df <- as.data.frame(comparisons$p.value)
+        comparisons_df$protein <- colnames(haem_data_df)[protein]
+        p_values_df <- rbind(comparisons_df,
+                             p_values_df)
+}
+
+head(p_values_df)
+colnames(p_values_df) <- c("gyne",
+                           "prediapause",
+                           "early_diapause",
+                           "late_diapause",
+                           "six_hours_postdiapause",
+                           "forty_eight_hours_postdiapause")
+
+## Create directory for output:
+dir.create(path = "./results/dataframes",
+           recursive = TRUE)
+
+for (name in 1:(length(colnames(p_values_df[1:5])))){
+        new_stage <- name + 1
+        print(colnames(p_values_df[name]))
+        stage_of_interest <- colnames(p_values_df[new_stage])
+        print(stage_of_interest)
+        output_df <- subset(p_values_df,
+                            p_values_df[name] < 0.05 &
+                                    grepl(paste("^",
+                                                stage_of_interest,
+                                   sep = ""),
+                             row.names(p_values_df)))
+        ## Write output:
+        output <- paste(colnames(p_values_df[name]),
+                                 "_vs_",
+                                 colnames(p_values_df[new_stage]),
+                        ".txt",
+                        sep = "")
+        ## Write to file:
+        write.table(output_df,
+                    file = paste("./results/dataframes/",
+                                 output,
+                                 sep = ""),
+                    sep = "\t",
+                    quote = FALSE)
+}
+```
+Check style:
+
+```{r, message = FALSE}
+## Run lintr:
+lintr::lint(file = "./bombus_queen_haemolymph_stats.Rmd")
+```
+
+
