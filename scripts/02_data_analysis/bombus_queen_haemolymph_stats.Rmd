@@ -5,9 +5,11 @@ authors: Joe Colgan (joscolgan)
 --- 
 
 ## Introduction:
-The purpose of this script is to take label-free quantification (LFQ) values from the software program, [Perseus](https://www.biochem.mpg.de/5111810/perseus), normalise and perform a principal component analysis. Two user-defined principal components are then plotted using the R package, [ggplot2](https://ggplot2.tidyverse.org/).  
-Multiple image plots can be generated using [ggpubr](http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/).  
-This script outputs a PCA plot in PNG and PDF formats.
+The purpose of this script is to take label-free quantification (LFQ) values from the software program, [Perseus](https://www.biochem.mpg.de/5111810/perseus) and perform:
+1) A One-way ANOVA to identify differentially abundant proteins across six bumblebee queen life-stages;
+2) Pairwise t-tests comparisons between each life-stages;
+3) Subset pairwise comparisons between consecutive life-stages.
+This script outputs tab-delimited text files containing results of ANOVA and pairwise t-tests.
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
