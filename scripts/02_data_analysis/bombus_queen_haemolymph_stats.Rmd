@@ -63,30 +63,18 @@ haem_data_df$life_stages <- life_stages
 haem_data_df$life_stages <- factor(haem_data_df$life_stages,
                              levels = c(unique(as.character(unlist(haem_data_df$life_stages)))))
 
-## Subset for plotting:
-haem_data_subset <- haem_data_df[, c(1:79)]
-
 ## Perform ANOVA:
 levels(haem_data_df$life_stages)
 
-library(dplyr)
-for (protein in 1:(ncol(haem_data_df) - 1)){
-group_by(haem_data_df, life_stages) %>%
-  summarise(
-    count = n(),
-    mean = mean(haem_data_df[, protein], na.rm = TRUE),
-    sd = sd(haem_data_df[, protein], na.rm = TRUE)
-  )
-}
-
 ## Perform a one_way ANOVA: 
-new_df <- data.frame()
+anova_df <- data.frame()
 tukey_output <- data.frame()
 tukey_output_df_sig <- data.frame()
 for (protein in 1:(ncol(haem_data_df) - 1)){
-        res.aov <- aov(haem_data_df[, protein] ~ life_stages, data = haem_data_df)
-        new_df <- rbind(unlist(summary(res.aov)), new_df)
-        tukey_output <- TukeyHSD(res.aov)
+        res_aov <- aov(haem_data_df[, protein] ~ life_stages,
+                       data = haem_data_df)
+        anova_df <- rbind(unlist(summary(res_aov)), anova_df)
+        tukey_output <- TukeyHSD(res_aov)
         tukey_output_df <- as.data.frame(tukey_output$life_stages)
         ## Update rowname:
         rownames(tukey_output_df) <- paste(rownames(tukey_output_df),
@@ -104,7 +92,7 @@ for (protein in 1:(ncol(haem_data_df) - 1)){
 }
 
 ## Update column names:
-colnames(new_df) <- c("DF1",
+colnames(anova_df) <- c("DF1",
                       "DF2",
                       "sum_sq1",
                       "sum_sq2",
@@ -114,6 +102,10 @@ colnames(new_df) <- c("DF1",
                       "f_value2",
                       "P_value",
                       "sig")
+
+## Write to file:
+write.table(anova_df, file = "./results/anova_output.txt")
+write.table(tukey_output_df_sig, file = "./results/tukey_output.txt")
 ```
 
 Performing a two-sample t-test:
@@ -131,7 +123,7 @@ for (protein in 1:(ncol(haem_data_df) - 1)){
                              p_values_df)
 }
 
-head(p_values_df)
+## Update columns for subsetting significant proteins from consecutive pairwise comparisons:
 colnames(p_values_df) <- c("gyne",
                            "prediapause",
                            "early_diapause",
