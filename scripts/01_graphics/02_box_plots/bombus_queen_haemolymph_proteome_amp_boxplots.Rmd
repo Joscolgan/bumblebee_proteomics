@@ -198,6 +198,7 @@ combined_boxplot <- ggarrange(reformat_for_plot(tmp_trans,
                             "late diapause"),
           nrow = 2,
           ncol = 2,
+          labels = c("A", "B", "C", "D"),
           common.legend = TRUE)
 
 
