@@ -52,7 +52,7 @@ dir.create(path = "./results/pdf/",
            recursive = TRUE)
 
 ## Define output:
-output_pdf <- "./results/pdf/figure_5.pdf"
+output_pdf <- "./results/pdf/figure_4.pdf"
 
 ## Save image:
 ggsave(file = output_pdf,
@@ -65,7 +65,7 @@ dir.create(path = "./results/png/",
            recursive = TRUE)
 
 ## Define output:
-output_png <- "./results/png/figure_5.png"
+output_png <- "./results/png/figure_4.png"
 
 ## Save image:
 ggsave(file = output_png,
