@@ -97,7 +97,6 @@ We filter out enriched terms.
 
 We do this for each of the three GO categories (ie. Biological process, Molcular Function, Cellular Component):
 
-
 ```{r, message = FALSE}
 for (go_category in c("BP", "MF", "CC")) {
   # STEP TWO
