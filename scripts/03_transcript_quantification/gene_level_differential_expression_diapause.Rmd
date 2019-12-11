@@ -85,7 +85,7 @@ samples_information <- read.table(file = paths$sample_batch_info,
                                                 "platform"),
                                   row.names = 1)
 
-## Make sure 'CON' is the reference:
+## Make 'Diapause' condition as the reference:
 samples_information$treatment <- relevel(x = samples_information$treatment,
                                          ref = "Diapause")
 
@@ -133,14 +133,6 @@ write.table(txi_counts_df,
 
 ### Step Four: Run DESeq2 for differential expression analysis:
 
-For identifying differentially expressed genes, a DESeq object is generated containing:
-    a. sample names
-    b. treatments
-    
-Within the present analysis, four questions can be immediately asked:
-    1. What genes are differentially expressed within clothianidin-exposed workers in comparison to control?
-    2. What genes are differentially expressed within imidacloprid-exposed workers in comparison to control?
-
 ```{r, message = FALSE}
 ## Construct DESeq data set from txi object and sample information:
 deseq_txi <- DESeqDataSetFromTximport(txi     = txi_counts,
@@ -149,13 +141,11 @@ deseq_txi <- DESeqDataSetFromTximport(txi     = txi_counts,
 ```
 
 # Run DESeq2 (Wald test) for differential expression analysis:
-  Which genes are differentially expressed between each treatment and control?
+  Which genes are differentially expressed between each time-point and diapause?
   Running a Wald t-test (default test within DESeq2)
   
 ```{r}
-## Which genes are differentially expressed within each treatment for
-## each caste in comparison to control?
-## Perform a LRT test to identify genes differentially expressed across timepoints:
+## Perform a LRT test to identify genes differentially expressed across time-points:
 deseq_object_lrt  <- DESeq(deseq_txi,
                            test = "LRT",
                            reduced = ~platform,
