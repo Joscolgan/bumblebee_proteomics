@@ -9,7 +9,8 @@ Scripts adapted from Colgan et al. (2019).
 Original script repository is here:
 https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment
 
-This script is for gene ontology (GO) enrichment analysis of differentiallly expressed genes to explore the biological processes and molecular functions associated with DE genes, using the R package 'TopGO' (https://www.bioconductor.org/packages/3.7/bioc/vignettes/topGO/inst/doc/topGO.pdf).
+This script is for gene ontology (GO) enrichment analysis of differentiallly expressed genes to explore the biological processes and molecular functions associated with DE genes, using the R package 'TopGO' (https://www.bioconductor.org/packages/3.7/bioc/vignettes/topGO/inst/doc/topGO.pdf).  
+
 Twp input files are required for the running of the test:  
 1) A genelist file:  
 The genelist file is a tab-delimited file containing two columns:  
@@ -24,8 +25,6 @@ Column 2: Comma separated GO terms (e.g. GO:0000001, GO:0000002, etc.).
 
 This script will prepare data for GO analysis and create a 'TopGO object' from which enrichment tests can be performed to explore GO terms significantly enriched within the dataset. 
 This script outputs a results table of significantly enriched GO terms.
-
-*It should be run once per treatment, and will produce 3 output files each time it is run*
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
@@ -100,10 +99,6 @@ for (go_category in c("BP", "MF", "CC")) {
   my_go_data <- new("topGOdata",
                     description = paste("GOtest", go_category, sep = "_"),
                     ontology    = go_category,
-                    #geneSel     = function(x) {
-                    #                 # fails to run without thi
-                    #                 return(x <= cutoff_for_top_fivepercent)
-                    #               },
                     allGenes    = geneList,
                     gene2GO     = gene_to_go_mapping,
                     annot       = annFUN.gene2GO,
