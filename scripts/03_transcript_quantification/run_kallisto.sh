@@ -45,7 +45,8 @@ ln -s ../src/kallisto/kallisto .
 cd ../data/
 mkdir reference_files
 cd reference_files
-wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/214/255/GCF_000214255.1_Bter_1.0/GCF_000214255.1_Bter_1.0_rna.fna.gzgunzip GCF_000214255.1_Bter_1.0_rna.fna.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/214/255/GCF_000214255.1_Bter_1.0/GCF_000214255.1_Bter_1.0_rna.fna.gz  
+gunzip GCF_000214255.1_Bter_1.0_rna.fna.gz
 
 ## Create an index
 cd ../results/
