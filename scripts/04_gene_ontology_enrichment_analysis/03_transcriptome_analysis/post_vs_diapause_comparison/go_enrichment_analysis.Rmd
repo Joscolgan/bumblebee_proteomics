@@ -25,8 +25,6 @@ Column 2: Comma separated GO terms (e.g. GO:0000001, GO:0000002, etc.).
 This script will prepare data for GO analysis and create a 'TopGO object' from which enrichment tests can be performed to explore GO terms significantly enriched within the dataset. 
 This script outputs a results table of significantly enriched GO terms.
 
-*It should be run once per treatment, and will produce 3 output files each time it is run*
-
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
 libraries <- c("topGO", "lintr", "lattice")
