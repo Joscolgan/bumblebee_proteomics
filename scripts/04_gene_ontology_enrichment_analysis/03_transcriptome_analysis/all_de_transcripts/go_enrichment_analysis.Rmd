@@ -23,9 +23,7 @@ Column 1: Locus (contains gene or transcript name of interest).
 Column 2: Comma separated GO terms (e.g. GO:0000001, GO:0000002, etc.).  
 
 This script will prepare data for GO analysis and create a 'TopGO object' from which enrichment tests can be performed to explore GO terms significantly enriched within the dataset. 
-This script outputs a results table of significantly enriched GO terms.
-
-*It should be run once per treatment, and will produce 3 output files each time it is run*
+This script outputs a results table of significantly enriched GO terms.  
 
 ```{r, message = FALSE}
 # Load libraries; install from scratch if needed
@@ -96,7 +94,6 @@ We combine the output of each test.
 We filter out enriched terms.
 
 We do this for each of the three GO categories (ie. Biological process, Molcular Function, Cellular Component):
-
 
 ```{r, message = FALSE}
 for (go_category in c("BP", "MF", "CC")) {
