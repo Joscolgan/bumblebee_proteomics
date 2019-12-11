@@ -6,7 +6,8 @@ These scripts were applied to investigate and visualise changes in the haemolymp
 This research was funded by [Science Foundation Ireland](http://www.sfi.ie/) as part of a grant awarded to [Mark Brown at Royal Holloway University of London, UK](https://www.markjfbrown.com/) with this specific study designed and performed in collaboration with [James Carolan at Maynooth University, Ireland](https://crawliomics.com/).  
 
 The results of this analysis are described in:  
-[Mating precedes selective immune priming which is maintained throughout bumblebee queen diapause](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-019-6314-9) Colgan TJ, Finaly S, Brown MJF, Carolan JC. _BMC Genomics_
+[Mating precedes selective immune priming which is maintained throughout bumblebee queen diapause](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-019-6314-9)  
+Colgan TJ, Finaly S, Brown MJF, Carolan JC. _BMC Genomics_
 
 For the transcriptomic analysis, scripts have been obtained and modified from:  
 https://github.com/wurmlab/Bter_neonicotinoid_exposure_experiment  
